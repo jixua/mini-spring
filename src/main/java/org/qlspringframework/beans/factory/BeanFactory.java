@@ -18,13 +18,13 @@ public interface BeanFactory {
      * @param name Bean名称
      * @param bean bean对象
      */
-    public void registerBean(String name , Object bean);
+//    public void registerBean(String name , Object bean);
 
 
     /**
      * 获取Bean
      * @param name Bean名称
      */
-    public void getBean(String name);
+    public Object getBean(String name);
 
 }

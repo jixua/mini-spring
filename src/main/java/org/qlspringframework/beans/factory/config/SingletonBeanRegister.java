@@ -13,4 +13,13 @@ public interface SingletonBeanRegister {
      * @return Bean对象
      */
     Object getSingletonBean(String beanName);
+
+
+    /**
+     * 添加单列Bean
+     *
+     * @param baenName
+     * @param bean
+     */
+    void addSingletonBean(String baenName ,Object bean);
 }
