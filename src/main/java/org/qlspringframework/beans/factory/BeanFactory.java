@@ -11,7 +11,6 @@ import java.util.Map;
 public interface BeanFactory {
 
 
-    public Map<String, Object> beanMap = new HashMap<>();
 
     /**
      * 注册Bean

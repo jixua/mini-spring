@@ -10,6 +10,8 @@ import org.qlspringframework.beans.factory.config.BeanDefinition;
  **/
 public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFactory{
 
+    private InstantiationStrategy instantiationStrategy = new SimpleInstantiationStrategy();
+
     /**
      * @param name Bean名称
      * @param beanDefinition Bean的定义信息
@@ -30,13 +32,11 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
     private Object doCreateBean(String name, BeanDefinition beanDefinition) throws BeanException {
 
 
-        // 获取Bean的Class对象
-        Class beanClass = beanDefinition.getaClass();
-
         // 通过反射创建对象
         Object bean = null;
         try {
-            bean = beanClass.newInstance();
+            // 通过InstantiationStrategy实例化Bean
+            bean = createBeanInstance(beanDefinition);
         } catch (Exception e) {
             throw new BeanException(e.getMessage());
         }
@@ -45,5 +45,26 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         super.addSingletonBean(name , bean);
 
         return bean;
+    }
+
+
+    /**
+     * 创建并返回一个Bean实例
+     * 此方法根据Bean定义来实例化Bean，具体实例化策略由获取到的实例化策略决定
+     *
+     * @param beanDefinition Bean的定义，包含了创建Bean实例所需的信息
+     * @return 实例化的Bean对象
+     */
+    private Object createBeanInstance(BeanDefinition beanDefinition) {
+        return getInstantiationStrategy().instantiate(beanDefinition);
+    }
+
+
+    public InstantiationStrategy getInstantiationStrategy() {
+        return instantiationStrategy;
+    }
+
+    public void setInstantiationStrategy(InstantiationStrategy instantiationStrategy) {
+        this.instantiationStrategy = instantiationStrategy;
     }
 }

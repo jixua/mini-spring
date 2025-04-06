@@ -11,20 +11,20 @@ public class BeanDefinition {
     private String beanName;
 
     // Bean的Class对象
-    private Class aClass;
+    private Class beanClass;
 
 
     public BeanDefinition(Class beanClass){
-        this.aClass = beanClass;
+        this.beanClass = beanClass;
     }
 
 
-    public Class getaClass() {
-        return aClass;
+    public Class getBeanClass() {
+        return beanClass;
     }
 
-    public void setaClass(Class aClass) {
-        this.aClass = aClass;
+    public void setBeanClass(Class beanClass) {
+        this.beanClass = beanClass;
     }
 
     public String getBeanName() {
