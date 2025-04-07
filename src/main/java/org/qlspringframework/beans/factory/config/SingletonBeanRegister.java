@@ -1,5 +1,4 @@
 package org.qlspringframework.beans.factory.config;
-
 /**
  * @description: 注册单列Bean
  * @author: jixu
@@ -14,12 +13,12 @@ public interface SingletonBeanRegister {
      */
     Object getSingletonBean(String beanName);
 
-
     /**
      * 添加单列Bean
      *
-     * @param baenName
-     * @param bean
+     * @param beanName Bean名称
+     * @param bean Bean对象
      */
-    void addSingletonBean(String baenName ,Object bean);
+    void addSingletonBean(String beanName, Object bean);
 }
+
