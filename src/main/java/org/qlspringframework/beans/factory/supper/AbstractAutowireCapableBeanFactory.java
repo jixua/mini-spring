@@ -1,9 +1,11 @@
 package org.qlspringframework.beans.factory.supper;
 
+import cn.hutool.core.bean.BeanUtil;
 import org.qlspringframework.beans.BeanException;
 import org.qlspringframework.beans.PropertyValue;
 import org.qlspringframework.beans.PropertyValues;
 import org.qlspringframework.beans.factory.config.BeanDefinition;
+import org.qlspringframework.beans.factory.config.BeanReference;
 
 import java.lang.reflect.Method;
 
@@ -78,7 +80,6 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
      * @param beanName bean的名称，用于错误信息或日志记录中
      */
     private void applyPropertyValues(Object bean, BeanDefinition beanDefinition, String beanName) {
-
         try {
             // 获取到要操作Bean到Class对象
             Class beanClass = beanDefinition.getBeanClass();
@@ -87,22 +88,26 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
             for (PropertyValue propertyValue : beanDefinition.getPropertyValues().getPropertyValueList()) {
                 // 对于属性的赋值要通过对应的set方法，构造出set方法的方法名
                 String name = propertyValue.getName();
-                String setMethodName = "set" + name.substring(0, 1).toUpperCase() + name.substring(1);
+                Object value = propertyValue.getValue();
+
+                // 如果是Bean
+                if (value instanceof BeanReference){
+                    value = super.getBean(name);
+                }
+
 
                 //通过属性的set方法设置属性
+                String setMethodName = "set" + name.substring(0, 1).toUpperCase() + name.substring(1);
                 Class<?> type = beanClass.getDeclaredField(name).getType();
 
                 // 通过反射动态调用
                 Method declaredMethod = beanClass.getDeclaredMethod(setMethodName, type);
-                declaredMethod.invoke(bean,propertyValue.getValue());
+                declaredMethod.invoke(bean, value);
+                // BeanUtil.setFieldValue(bean, name, value);
             }
         }catch (Exception e){
             throw new BeanException(String.format("bean 属性注入异常[%s]",beanName) ,  e);
         }
-
-
-
-
     }
 
 

@@ -12,6 +12,7 @@ import org.qlspringframework.beans.factory.config.BeanDefinition;
  * @date 2025/4/5 19:52
  */
 public interface InstantiationStrategy {
+
     /**
      * 根据Bean定义信息实例化Bean
      * 该方法根据传入的BeanDefinition对象中的信息来创建Bean实例
