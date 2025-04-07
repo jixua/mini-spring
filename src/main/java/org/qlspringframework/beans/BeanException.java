@@ -1,4 +1,4 @@
-package org.qlspringframework.beans.factory;
+package org.qlspringframework.beans;
 
 /**
  * @description: Bean异常

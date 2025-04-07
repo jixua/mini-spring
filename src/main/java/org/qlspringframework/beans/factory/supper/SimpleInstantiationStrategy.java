@@ -1,6 +1,6 @@
 package org.qlspringframework.beans.factory.supper;
 
-import org.qlspringframework.beans.factory.BeanException;
+import org.qlspringframework.beans.BeanException;
 import org.qlspringframework.beans.factory.config.BeanDefinition;
 
 import java.lang.reflect.Constructor;

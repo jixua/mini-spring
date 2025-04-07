@@ -24,7 +24,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
      * @param beanDefinition
      */
     @Override
-    public void rigisterBeanDefinition(String beanName, BeanDefinition beanDefinition) {
+    public void registerBeanDefinition(String beanName, BeanDefinition beanDefinition) {
         beanDefinitionMap.put(beanName,beanDefinition);
     }
 
