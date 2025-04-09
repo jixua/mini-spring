@@ -1,5 +1,6 @@
 package org.qlspringframework.core.io;
 
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 
 /**
@@ -11,19 +12,25 @@ public class ClassPathResource implements Resource{
 
     // 文件相对路径
     private final String path;
+    private final ClassLoader classLoader;
 
     public ClassPathResource(String path) {
         this.path = path;
+        this.classLoader = this.getClass().getClassLoader();
     }
 
 
     @Override
     public InputStream getInputStream() {
-        InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(path);
-        if (inputStream == null){
-
+        try {
+            InputStream inputStream = classLoader.getResourceAsStream(path);
+            if (inputStream == null){
+                throw new FileNotFoundException(String.format("%s，文件不存在",this.path));
+            }
+            return inputStream;
+        }catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
         }
-        return inputStream;
 
     }
 }
