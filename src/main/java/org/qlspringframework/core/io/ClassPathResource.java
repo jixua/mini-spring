@@ -21,16 +21,12 @@ public class ClassPathResource implements Resource{
 
 
     @Override
-    public InputStream getInputStream() {
-        try {
-            InputStream inputStream = classLoader.getResourceAsStream(path);
-            if (inputStream == null){
-                throw new FileNotFoundException(String.format("%s，文件不存在",this.path));
-            }
-            return inputStream;
-        }catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
+    public InputStream getInputStream() throws FileNotFoundException {
+        InputStream inputStream = classLoader.getResourceAsStream(path);
+        if (inputStream == null){
+            throw new FileNotFoundException(String.format("%s，文件不存在",this.path));
         }
+        return inputStream;
 
     }
 }
