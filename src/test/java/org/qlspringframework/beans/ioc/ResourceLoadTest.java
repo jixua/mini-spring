@@ -35,4 +35,14 @@ public class ResourceLoadTest {
         System.out.println(read);
 
     }
+
+    @Test
+    public void testURLResource() throws IOException {
+        DefaultResourceLoader defaultResourceLoader = new DefaultResourceLoader();
+        Resource resource = defaultResourceLoader.getResource("https://gitee.com/y_project/RuoYi/blob/master/README.md");
+        InputStream inputStream = resource.getInputStream();
+        String read = IoUtil.readUtf8(inputStream);
+        System.out.println(read);
+
+    }
 }
