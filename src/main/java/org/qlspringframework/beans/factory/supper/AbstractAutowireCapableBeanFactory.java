@@ -1,9 +1,8 @@
 package org.qlspringframework.beans.factory.supper;
 
-import cn.hutool.core.bean.BeanUtil;
 import org.qlspringframework.beans.BeanException;
 import org.qlspringframework.beans.PropertyValue;
-import org.qlspringframework.beans.PropertyValues;
+import org.qlspringframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.qlspringframework.beans.factory.config.BeanDefinition;
 import org.qlspringframework.beans.factory.config.BeanReference;
 
@@ -14,18 +13,18 @@ import java.lang.reflect.Method;
  * @author: jixu
  * @create: 2025-03-28 16:42
  **/
-public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFactory{
+public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFactory implements AutowireCapableBeanFactory {
 
     private InstantiationStrategy instantiationStrategy = new SimpleInstantiationStrategy();
 
     /**
-     * @param name Bean名称
+     * @param beanName Bean名称
      * @param beanDefinition Bean的定义信息
      * @return Bean实列
      */
     @Override
-    protected Object createBean(String name, BeanDefinition beanDefinition) {
-        return doCreateBean(name , beanDefinition);
+    protected Object createBean(String beanName, BeanDefinition beanDefinition) {
+        return doCreateBean(beanName , beanDefinition);
     }
 
 
@@ -35,7 +34,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
      * 如何创建Bean？
      * 通过beanDefinition当中保存的Bean的Class对象，通过反射的方式创建Bean
      */
-    private Object doCreateBean(String name, BeanDefinition beanDefinition) throws BeanException {
+    private Object doCreateBean(String beanName, BeanDefinition beanDefinition) throws BeanException {
 
 
         // 通过反射创建对象
@@ -45,18 +44,30 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
             bean = createBeanInstance(beanDefinition);
 
             // 为Bean的属性进行赋值
-            applyPropertyValues(bean , beanDefinition , name);
+            applyPropertyValues(bean , beanDefinition , beanName);
+
+            // 执行bean的初始化方法和BeanPostProcessor的前置和后置处理方法
+            initializeBean(beanName , bean);
         } catch (Exception e) {
             throw new BeanException(e.getMessage());
         }
 
         // 创建完毕后加入缓存
-        super.addSingletonBean(name , bean);
+        super.addSingletonBean(beanName, bean);
 
         return bean;
     }
 
+    private void initializeBean(String beanName, Object bean) {
+        // 执行初始化之前的BeanPostProcessor前置处理
+        Object wrappedBean  = applyBeanPostProcessorsBeforeInitialization(bean, beanName);
+        // 执行初始化方法
 
+        // 执行初始化之前的BeanPostProcessor后置
+        wrappedBean = applyBeanPostProcessorsAfterInitialization(bean , beanName);
+
+
+    }
 
 
     /**
@@ -117,5 +128,32 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
     public void setInstantiationStrategy(InstantiationStrategy instantiationStrategy) {
         this.instantiationStrategy = instantiationStrategy;
+    }
+    
+    
+
+    /**
+     * 在Bean初始化之前执行BeanPostProcessors的增强方法
+     *
+     * @param existingBean 当前已经存在的Bean实例
+     * @param beanName     Bean的名称
+     * @return 经过所有BeanPostProcessors处理后的Bean实例
+     */
+    @Override
+    public Object applyBeanPostProcessorsBeforeInitialization(Object existingBean, String beanName) {
+
+        return null;
+    }
+
+    /**
+     * 在Bean初始化之后执行BeanPostProcessors增强方法
+     *
+     * @param existingBean 当前已经存在的Bean实例
+     * @param beanName     Bean的名称
+     * @return 经过所有BeanPostProcessors处理后的Bean实例
+     */
+    @Override
+    public Object applyBeanPostProcessorsAfterInitialization(Object existingBean, String beanName) {
+        return null;
     }
 }

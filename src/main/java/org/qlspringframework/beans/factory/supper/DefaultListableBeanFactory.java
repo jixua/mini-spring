@@ -32,11 +32,11 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
     /**
      * 获取BeanDefinition
      *
-     * @param name
+     * @param beanName
      * @return
      */
     @Override
-    protected BeanDefinition getBeanDefinition(String name) {
-        return beanDefinitionMap.get(name);
+    protected BeanDefinition getBeanDefinition(String beanName) {
+        return beanDefinitionMap.get(beanName);
     }
 }
