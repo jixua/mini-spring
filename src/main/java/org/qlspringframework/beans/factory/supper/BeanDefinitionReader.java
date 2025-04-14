@@ -32,7 +32,7 @@ public interface BeanDefinitionReader {
 
     /**
      * 根据指定的多个资源位置加载BeanDefinition。
-     * @param location 资源的位置数组，通常为文件路径或URL数组
+     * @param locations 资源的位置数组，通常为文件路径或URL数组
      */
     void loadBeanDefinitions(String[] locations);
 

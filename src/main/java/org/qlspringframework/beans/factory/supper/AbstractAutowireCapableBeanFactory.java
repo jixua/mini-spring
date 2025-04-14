@@ -4,9 +4,11 @@ import org.qlspringframework.beans.BeanException;
 import org.qlspringframework.beans.PropertyValue;
 import org.qlspringframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.qlspringframework.beans.factory.config.BeanDefinition;
+import org.qlspringframework.beans.factory.config.BeanPostProcessor;
 import org.qlspringframework.beans.factory.config.BeanReference;
 
 import java.lang.reflect.Method;
+import java.util.List;
 
 /**
  * @description: 主要负责Bean的创建逻辑
@@ -16,6 +18,8 @@ import java.lang.reflect.Method;
 public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFactory implements AutowireCapableBeanFactory {
 
     private InstantiationStrategy instantiationStrategy = new SimpleInstantiationStrategy();
+
+
 
     /**
      * @param beanName Bean名称
@@ -141,8 +145,16 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
      */
     @Override
     public Object applyBeanPostProcessorsBeforeInitialization(Object existingBean, String beanName) {
-
-        return null;
+        Object result = existingBean;
+        List<BeanPostProcessor> beanPostProcessors = super.getBeanPostProcessors();
+        for (BeanPostProcessor postProcessor : beanPostProcessors) {
+            Object current = postProcessor.postProcessBeforeInitialization(result, beanName);
+            if (current == null){
+                return result;
+            }
+            result = current;
+        }
+        return result;
     }
 
     /**
@@ -154,6 +166,15 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
      */
     @Override
     public Object applyBeanPostProcessorsAfterInitialization(Object existingBean, String beanName) {
-        return null;
+        Object result = existingBean;
+        List<BeanPostProcessor> beanPostProcessors = super.getBeanPostProcessors();
+        for (BeanPostProcessor postProcessor : beanPostProcessors) {
+            Object current = postProcessor.postProcessAfterInitialization(result, beanName);
+            if (current == null){
+                return result;
+            }
+            result = current;
+        }
+        return result;
     }
 }

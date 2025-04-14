@@ -4,7 +4,7 @@ package org.qlspringframework.beans.factory.config;
  * @author: jixu
  * @create: 2025-03-28 15:39
  **/
-public interface SingletonBeanRegister {
+public interface SingletonBeanRegistry {
 
     /**
      * 获取单列Bean

@@ -1,5 +1,6 @@
 package org.qlspringframework.beans.factory.supper;
 
+import org.qlspringframework.beans.factory.ConfigurableListableBeanFactory;
 import org.qlspringframework.beans.factory.config.BeanDefinition;
 
 import java.util.HashMap;
@@ -10,7 +11,7 @@ import java.util.Map;
  * @author: jixu
  * @create: 2025-03-28 17:06
  **/
-public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFactory implements BeanDefinitionRegister{
+public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFactory implements BeanDefinitionRegister , ConfigurableListableBeanFactory {
 
 
     private Map<String , BeanDefinition> beanDefinitionMap = new HashMap<>();
@@ -39,4 +40,6 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
     protected BeanDefinition getBeanDefinition(String beanName) {
         return beanDefinitionMap.get(beanName);
     }
+
+
 }

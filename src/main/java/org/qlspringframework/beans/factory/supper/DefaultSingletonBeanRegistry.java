@@ -1,6 +1,6 @@
 package org.qlspringframework.beans.factory.supper;
 
-import org.qlspringframework.beans.factory.config.SingletonBeanRegister;
+import org.qlspringframework.beans.factory.config.SingletonBeanRegistry;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author: jixu
  * @create: 2025-03-28 15:41
  **/
-public class DefaultSignletonBeanRegister implements SingletonBeanRegister {
+public class DefaultSingletonBeanRegistry implements SingletonBeanRegistry {
 
 
     // 保存单列Bean的地方

@@ -1,14 +1,36 @@
 package org.qlspringframework.beans.factory.supper;
 
 import org.qlspringframework.beans.factory.config.BeanDefinition;
+import org.qlspringframework.beans.factory.config.BeanPostProcessor;
 import org.qlspringframework.beans.factory.config.ConfigurableBeanFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @description: 抽象的Bean工厂，实现BeanFactory的相关功能
  * @author: jixu
  * @create: 2025-03-28 15:47
  **/
-public abstract class AbstractBeanFactory extends DefaultSignletonBeanRegister implements ConfigurableBeanFactory {
+public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry implements ConfigurableBeanFactory {
+
+    /**
+     * BeanPostProcess是对指定Bean的增强，可以定义多个processors
+     */
+    private final List<BeanPostProcessor> beanPostProcessors  = new ArrayList<>();
+
+    /**
+     * 添加beanPostProcessor
+     * @param beanPostProcessor
+     */
+    @Override
+    public void addBeanPostProcessor(BeanPostProcessor beanPostProcessor) {
+        this.beanPostProcessors.add(beanPostProcessor);
+    }
+
+    public List<BeanPostProcessor> getBeanPostProcessors(){
+        return this.beanPostProcessors;
+    }
 
     /**
      * 获取Bean
