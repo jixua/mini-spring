@@ -17,7 +17,7 @@ public class XmlResourceReaderTest {
         DefaultListableBeanFactory factory = new DefaultListableBeanFactory();
         XmlBeanDefinitionReader xmlBeanDefinitionReader = new XmlBeanDefinitionReader(factory);
         xmlBeanDefinitionReader.loadBeanDefinitions("classpath:spring.xml");
-        People person = (People) factory.getBean("person");
+        People person = (People) factory.getBean("people");
         System.out.println(person);
     }
 }

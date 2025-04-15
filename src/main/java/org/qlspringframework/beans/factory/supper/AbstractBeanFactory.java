@@ -1,5 +1,6 @@
 package org.qlspringframework.beans.factory.supper;
 
+import org.qlspringframework.beans.BeanException;
 import org.qlspringframework.beans.factory.config.BeanDefinition;
 import org.qlspringframework.beans.factory.config.BeanPostProcessor;
 import org.qlspringframework.beans.factory.config.ConfigurableBeanFactory;
@@ -25,6 +26,7 @@ public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry i
      */
     @Override
     public void addBeanPostProcessor(BeanPostProcessor beanPostProcessor) {
+        this.beanPostProcessors.remove(beanPostProcessor);
         this.beanPostProcessors.add(beanPostProcessor);
     }
 
@@ -51,6 +53,10 @@ public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry i
 
         // 如果没有尝试创建Bean,Bean的创建需要通过BeanDefinition
         BeanDefinition beanDefinition = getBeanDefinition(beanName);
+
+        if (beanDefinition == null){
+            throw new BeanException("beanDefinition is null");
+        }
 
         // 创建Bean
         return createBean(beanName , beanDefinition);

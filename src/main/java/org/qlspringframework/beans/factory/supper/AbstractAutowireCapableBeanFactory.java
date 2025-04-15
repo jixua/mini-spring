@@ -65,11 +65,11 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
     private void initializeBean(String beanName, Object bean) {
         // 执行初始化之前的BeanPostProcessor前置处理
         Object wrappedBean  = applyBeanPostProcessorsBeforeInitialization(bean, beanName);
+
         // 执行初始化方法
 
         // 执行初始化之前的BeanPostProcessor后置
         wrappedBean = applyBeanPostProcessorsAfterInitialization(bean , beanName);
-
 
     }
 
