@@ -1,30 +1,5 @@
 在上一篇当中我们完成了对三种资源文件的读写
-
-```mermaid
-classDiagram
-direction BT
-class ClassPathResource {
-   InputStream inputStream
-  + ClassPathResource(String) 
-}
-class FileSystemResource {
-   InputStream inputStream
-  + FileSystemResource(String) 
-}
-class Resource {
-<<Interface>>
-   InputStream inputStream
-}
-class URLResource {
-   InputStream inputStream
-  + URLResource(URL) 
-}
-
-ClassPathResource  ..>  Resource 
-FileSystemResource  ..>  Resource 
-URLResource  ..>  Resource 
-
-```
+![[../assets/Pasted image 20250415162321.png]]
 
 
 ```java

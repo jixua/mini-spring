@@ -386,31 +386,7 @@ public void testBeanPostPostProcess() {
 
 我们来看一下是如何抽取的，通俗的说我们又抽取了ListableBeanFactory这个分支用来处理BeanFactoryPostProcess也就是对BeanDefinition操作的相关逻辑。
 
-```mermaid
-classDiagram
-direction BT
-class ConfigurableListableBeanFactory {
-<<Interface>>
-  + getBeanDefinition(String) BeanDefinition
-}
-class DefaultListableBeanFactory {
-  - Map~String, BeanDefinition~ beanDefinitionMap
-  + getBeanDefinition(String) BeanDefinition
-  + getBeanOfType(Class~T~) Map~String, T~
-  + getBeanDefinitionName() String[]
-  + registerBeanDefinition(String, BeanDefinition) void
-  + DefaultListableBeanFactory() 
-}
-class ListableBeanFactory {
-<<Interface>>
-  + getBeanDefinitionName() String[]
-  + getBeanOfType(Class~T~) Map~String, T~
-}
-
-ConfigurableListableBeanFactory  -->  ListableBeanFactory 
-DefaultListableBeanFactory  ..>  ConfigurableListableBeanFactory 
-
-```
+![[../assets/Pasted image 20250415162402.png]]
 
 ```java
 public interface ListableBeanFactory extends BeanFactory {  
