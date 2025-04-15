@@ -25,7 +25,7 @@ Mini-Spring 是一个简化版的 Spring 框架实现，旨在帮助开发者更
 ## 快速开始
 1. 克隆项目到本地
 ```bash
-git clone [项目地址]
+git clone https://gitee.com/jixuonline/jixu-mini-spring.git
 ```
 
 2. 使用 Maven 安装依赖
