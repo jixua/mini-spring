@@ -1,13 +1,18 @@
 package org.qlspringframework.beans.factory;
 
 import java.util.Map;
-
 /**
- * @description: 对BeanFactory的相关功能进行扩展
- * @author: jixu
- * @create: 2025-04-11 15:00
- **/
+ * ListableBeanFactory 接口扩展了 BeanFactory 接口，提供了对 Bean 的列举功能。
+ * 该接口允许获取工厂中所有 Bean 的名称、根据类型获取 Bean 的名称或实例，
+ * 以及检查 Bean 的定义信息等操作。
+ *
+ * 通过实现该接口，BeanFactory 可以提供更丰富的 Bean 管理功能，特别是在需要
+ * 列举或查询 Bean 的场景下。
+ *
+ * @see BeanFactory
+ */
 public interface ListableBeanFactory extends BeanFactory {
+
 
     /**
      * 根据指定的类型获取所有符合条件的Bean实例，并以Map形式返回。

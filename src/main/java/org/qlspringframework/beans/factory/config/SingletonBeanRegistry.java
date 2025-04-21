@@ -1,4 +1,7 @@
 package org.qlspringframework.beans.factory.config;
+
+
+
 /**
  * @description: 注册单列Bean
  * @author: jixu

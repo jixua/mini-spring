@@ -1,28 +1,16 @@
 package org.qlspringframework.beans.factory;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
- * @description: Bean工厂，提供最基础的Bean的get/set
- * @author: jixu
- * @create: 2025-03-28 15:23
- **/
+ * BeanFactory 接口定义了获取 Bean 实例的方法。
+ * 该接口是 Spring 框架中用于管理 Bean 的核心接口之一。
+ */
 public interface BeanFactory {
 
-
-
     /**
-     * 注册Bean
-     * @param name Bean名称
-     * @param bean bean对象
-     */
-   // public void registerBean(String name , Object bean);
-
-
-    /**
-     * 获取Bean
-     * @param name Bean名称
+     * 根据指定的 Bean 名称获取对应的 Bean 实例。
+     *
+     * @param name Bean 的名称，通常是在 Spring 配置文件中定义的 Bean 的 ID 或名称。
+     * @return 返回与指定名称对应的 Bean 实例。如果找不到对应的 Bean，可能会抛出异常。
      */
     public Object getBean(String name);
 
