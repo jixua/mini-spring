@@ -9,7 +9,6 @@ BeanPostProcessor的实现包括两个部分，分别为`postProcessBeforeInitia
 ```java
 private Object doCreateBean(String beanName, BeanDefinition beanDefinition) throws BeanException {  
   
-  
     // 通过反射创建对象  
     Object bean = null;  
     try {  
@@ -487,7 +486,10 @@ DefaultListableBeanFactory是ConfigurableListableBeanFactory的实现，这样�
  * BeanFactoryPostProcessor 是一个接口，用于在 Spring 容器实例化所有 bean 之后，但在 bean 初始化之前，  
  * 对 BeanFactory 进行后处理。实现该接口的类可以通过 `postProcessBeanFactory` 方法对 BeanFactory 进行自定义的修改或扩展。  
  *  
- * @author: jixu * @create: 2025-04-11 16:36 **/public interface BeanFactoryPostProcessor {  
+ * @author: jixu 
+ * @create: 2025-04-11 16:36 
+ * **/
+public interface BeanFactoryPostProcessor {  
   
     /**  
      * 对 BeanFactory 进行后处理的方法。该方法在 Spring 容器实例化所有 bean 之后，但在 bean 初始化之前被调用。  
