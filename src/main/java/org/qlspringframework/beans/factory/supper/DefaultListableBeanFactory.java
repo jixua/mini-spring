@@ -42,6 +42,14 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
         return beanDefinitionMap.get(beanName);
     }
 
+    /**
+     *
+     */
+    @Override
+    public void preInstantiateSingletons() {
+        beanDefinitionMap.keySet().forEach(this::getBean);
+    }
+
 
     /**
      * 根据指定的类型获取所有符合条件的Bean实例，并以Map形式返回。
@@ -69,7 +77,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
      * @return 包含所有Bean定义名称的字符串数组
      */
     @Override
-    public String[] getBeanDefinitionName() {
+    public String[] getBeanDefinitionNames() {
         Set<String> beanDefinitionNames = beanDefinitionMap.keySet();
         return beanDefinitionNames.toArray(new String[beanDefinitionNames.size()]);
     }

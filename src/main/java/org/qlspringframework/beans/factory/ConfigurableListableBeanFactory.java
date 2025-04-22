@@ -1,6 +1,7 @@
 package org.qlspringframework.beans.factory;
 
 import org.qlspringframework.beans.factory.config.BeanDefinition;
+import org.qlspringframework.beans.factory.config.BeanPostProcessor;
 
 /**
  * ConfigurableListableBeanFactory 接口扩展了 ListableBeanFactory 接口，提供了对 Bean 工厂的配置和列表功能。
@@ -16,5 +17,9 @@ public interface ConfigurableListableBeanFactory extends ListableBeanFactory {
 
     BeanDefinition getBeanDefinition(String beanNane);
 
+    void addBeanPostProcessor(BeanPostProcessor beanPostProcessor);
+
+
+    void preInstantiateSingletons();
 }
 

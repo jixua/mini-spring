@@ -4,21 +4,22 @@ import org.qlspringframework.core.io.DefaultResourceLoader;
 import org.qlspringframework.core.io.ResourceLoader;
 
 /**
- * @description:
+ * AbstractBeanDefinitionReader 是一个抽象类，实现了 BeanDefinitionReader 接口，
+ * 用于读取和注册 BeanDefinition。它提供了资源加载和 BeanDefinition 注册的基本功能。
+ *
  * @author: jixu
  * @create: 2025-04-10 14:06
  **/
-public abstract class AbstractBeanDefinitionReader implements BeanDefinitionReader{
+public abstract class AbstractBeanDefinitionReader implements BeanDefinitionReader {
 
     private ResourceLoader resourceLoader;
 
     private final BeanDefinitionRegister beanDefinitionRegister;
 
     /**
-     * beanDefinitionRegister是用来注册BeanDefinition使用的
-     * 其子类DefaultListableBeanFactory实现了beanDefinitionRegister与BeanFactory
-     * 可以通过DefaultListableBeanFactory获取、创建Bean
-     * @param beanDefinitionRegister 用于注册BeanDefinition的实例
+     * 构造函数，初始化 AbstractBeanDefinitionReader 实例。
+     *
+     * @param beanDefinitionRegister 用于注册 BeanDefinition 的实例
      */
     protected AbstractBeanDefinitionReader(BeanDefinitionRegister beanDefinitionRegister) {
         this.resourceLoader = new DefaultResourceLoader();
@@ -26,7 +27,7 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
     }
 
     /**
-     * 根据指定的多个资源位置加载BeanDefinition。
+     * 根据指定的多个资源位置加载 BeanDefinition。
      *
      * @param locations 资源的位置数组，通常为文件路径或URL数组
      */
@@ -38,9 +39,9 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
     }
 
     /**
-     * 获取BeanDefinitionRegister实例。
+     * 获取 BeanDefinitionRegister 实例。
      *
-     * @return BeanDefinitionRegister 用于注册BeanDefinition的实例
+     * @return BeanDefinitionRegister 用于注册 BeanDefinition 的实例
      */
     @Override
     public BeanDefinitionRegister getRegistry() {
@@ -48,7 +49,7 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
     }
 
     /**
-     * 获取ResourceLoader实例。
+     * 获取 ResourceLoader 实例。
      *
      * @return ResourceLoader 用于加载资源的实例
      */
@@ -57,6 +58,11 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
         return resourceLoader;
     }
 
+    /**
+     * 设置 ResourceLoader 实例。
+     *
+     * @param resourceLoader 用于加载资源的实例
+     */
     public void setResourceLoader(ResourceLoader resourceLoader) {
         this.resourceLoader = resourceLoader;
     }

@@ -1,8 +1,12 @@
 package org.qlspringframework.context.support;
 
 import org.qlspringframework.beans.factory.ConfigurableListableBeanFactory;
+import org.qlspringframework.beans.factory.config.BeanFactoryPostProcessor;
+import org.qlspringframework.beans.factory.config.BeanPostProcessor;
 import org.qlspringframework.context.ConfigurableApplicationContext;
 import org.qlspringframework.core.io.DefaultResourceLoader;
+
+import java.util.Map;
 
 /**
  * AbstractApplicationContext 是一个抽象类，实现了 ConfigurableApplicationContext 接口。
@@ -24,12 +28,34 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
     public void refresh() {
         // 通过子类创建BeanFactory，同时初始化beanDefinition
         refreshBeanFactory();
+
         // 获取到Bean工厂
         ConfigurableListableBeanFactory beanFactory = getBeanFactory();
 
-        // 执行BeanPostProcess的方法
+        // 执行BeanFactoryPostProcess的方法
+        invokeBeanFactoryPostProcessors(beanFactory);
 
+        // 注册BeanPostPostProcess
+        registerBeanPostProcessors(beanFactory);
 
+        // 提前初始化单列Bean
+        beanFactory.preInstantiateSingletons();
+
+    }
+
+    private void registerBeanPostProcessors(ConfigurableListableBeanFactory beanFactory) {
+        Map<String, BeanPostProcessor> beanPostProcessorMap = beanFactory.getBeanOfType(BeanPostProcessor.class);
+        for (BeanPostProcessor beanPostProcessor : beanPostProcessorMap.values()) {
+            beanFactory.addBeanPostProcessor(beanPostProcessor);
+        }
+    }
+
+    private void invokeBeanFactoryPostProcessors(ConfigurableListableBeanFactory beanFactory) {
+        // 获取到所有已注册到容器当中的BeanPostProcess
+        Map<String, BeanFactoryPostProcessor> beanFactoryPostProcessorMap = beanFactory.getBeanOfType(BeanFactoryPostProcessor.class);
+        for (BeanFactoryPostProcessor beanFactoryPostProcessor : beanFactoryPostProcessorMap.values()) {
+            beanFactoryPostProcessor.postProcessBeanFactory(beanFactory);
+        }
 
     }
 
@@ -38,5 +64,37 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 
     protected abstract ConfigurableListableBeanFactory  getBeanFactory();
 
+    /**
+     * 根据指定的类型获取所有符合条件的Bean实例，并以Map形式返回。
+     * Map的键为Bean的名称，值为对应的Bean实例。
+     *
+     * @param type 要查找的Bean类型
+     * @return 包含所有符合类型条件的Bean实例的Map，键为Bean名称，值为Bean实例
+     */
+    @Override
+    public <T> Map<String, T> getBeanOfType(Class<T> type) {
+        return getBeanFactory().getBeanOfType(type);
+    }
+
+    /**
+     * 获取当前BeanFactory中所有Bean定义的名称。
+     *
+     * @return 包含所有Bean定义名称的字符串数组
+     */
+    @Override
+    public String[] getBeanDefinitionNames() {
+        return getBeanFactory().getBeanDefinitionNames();
+    }
+
+    /**
+     * 根据指定的 Bean 名称获取对应的 Bean 实例。
+     *
+     * @param name Bean 的名称，通常是在 Spring 配置文件中定义的 Bean 的 ID 或名称。
+     * @return 返回与指定名称对应的 Bean 实例。如果找不到对应的 Bean，可能会抛出异常。
+     */
+    @Override
+    public Object getBean(String name) {
+        return getBeanFactory().getBean(name);
+    }
 }
 
