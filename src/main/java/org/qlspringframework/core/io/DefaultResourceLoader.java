@@ -4,7 +4,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
- * @description:
+ * 默认的资源加载器类
+ * 实现了ResourceLoader接口，用于加载各种类型的资源
+ *
  * @author: jixu
  * @create: 2025-04-09 10:47
  **/

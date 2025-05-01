@@ -8,34 +8,33 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * @description: 管理 Bean 的生命周期（创建、依赖注入、缓存等）
+ * 默认的可列出Bean的工厂类，继承了AbstractAutowireCapableBeanFactory并实现了BeanDefinitionRegister和ConfigurableListableBeanFactory接口。
+ * 该类主要负责Bean的定义、注册、获取等功能。
+ *
  * @author: jixu
  * @create: 2025-03-28 17:06
  **/
 public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFactory implements BeanDefinitionRegister , ConfigurableListableBeanFactory {
 
-
+    // 存储Bean名称和其对应定义的Map
     private Map<String , BeanDefinition> beanDefinitionMap = new HashMap<>();
-
-
 
     /**
      * 注册BeanDefinition
      *
-     * @param beanName
-     * @param beanDefinition
+     * @param beanName Bean的名称
+     * @param beanDefinition Bean的定义
      */
     @Override
     public void registerBeanDefinition(String beanName, BeanDefinition beanDefinition) {
         beanDefinitionMap.put(beanName,beanDefinition);
     }
 
-
     /**
      * 获取BeanDefinition
      *
-     * @param beanName
-     * @return
+     * @param beanName Bean的名称
+     * @return 对应名称的Bean定义
      */
     @Override
     public BeanDefinition getBeanDefinition(String beanName) {
@@ -43,13 +42,12 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
     }
 
     /**
-     *
+     * 提前实例化所有单例Bean。
      */
     @Override
     public void preInstantiateSingletons() {
         beanDefinitionMap.keySet().forEach(this::getBean);
     }
-
 
     /**
      * 根据指定的类型获取所有符合条件的Bean实例，并以Map形式返回。

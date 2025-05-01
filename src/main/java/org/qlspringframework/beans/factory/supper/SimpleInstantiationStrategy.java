@@ -6,6 +6,7 @@ import org.qlspringframework.beans.factory.config.BeanDefinition;
 import java.lang.reflect.Constructor;
 
 /**
+ * SimpleInstantiationStrategy类实现了InstantiationStrategy接口，用于实例化Bean对象
  * @author jixu
  * @title SimpleInstantiationStrategy
  * @date 2025/4/5 19:53

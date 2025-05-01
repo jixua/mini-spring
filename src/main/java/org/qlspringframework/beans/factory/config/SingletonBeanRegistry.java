@@ -1,9 +1,7 @@
 package org.qlspringframework.beans.factory.config;
 
-
-
 /**
- * @description: 注册单列Bean
+ * 单例Bean注册表接口，用于管理和访问单例Bean
  * @author: jixu
  * @create: 2025-03-28 15:39
  **/
@@ -24,4 +22,3 @@ public interface SingletonBeanRegistry {
      */
     void addSingletonBean(String beanName, Object bean);
 }
-

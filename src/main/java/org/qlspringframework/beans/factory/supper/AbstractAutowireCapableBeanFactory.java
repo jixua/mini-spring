@@ -11,36 +11,36 @@ import java.lang.reflect.Method;
 import java.util.List;
 
 /**
- * @description: 主要负责Bean的创建逻辑
+ * 抽象的自动装配功能的Bean工厂类
+ * 实现了Bean的创建、依赖注入、初始化以及BeanPostProcessor的处理等功能
+ *
  * @author: jixu
  * @create: 2025-03-28 16:42
  **/
 public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFactory implements AutowireCapableBeanFactory {
 
+    // 实例化策略，用于创建Bean实例
     private InstantiationStrategy instantiationStrategy = new SimpleInstantiationStrategy();
 
-
-
     /**
+     * 创建Bean实例
+     * 根据Bean的定义信息，创建并初始化Bean实例
+     *
      * @param beanName Bean名称
      * @param beanDefinition Bean的定义信息
-     * @return Bean实列
+     * @return Bean实例
      */
     @Override
     protected Object createBean(String beanName, BeanDefinition beanDefinition) {
         return doCreateBean(beanName , beanDefinition);
     }
 
-
     /**
      * 执行具体创建Bean的逻辑
-     *
      * 如何创建Bean？
      * 通过beanDefinition当中保存的Bean的Class对象，通过反射的方式创建Bean
      */
     private Object doCreateBean(String beanName, BeanDefinition beanDefinition) throws BeanException {
-
-
         // 通过反射创建对象
         Object bean = null;
         try {
@@ -62,18 +62,22 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         return bean;
     }
 
+    /**
+     * 初始化Bean
+     * 执行Bean的初始化方法以及BeanPostProcessor的前置和后置处理方法
+     *
+     * @param beanName Bean名称
+     * @param bean Bean实例
+     */
     private void initializeBean(String beanName, Object bean) {
         // 执行初始化之前的BeanPostProcessor前置处理
         Object wrappedBean  = applyBeanPostProcessorsBeforeInitialization(bean, beanName);
 
         // 执行初始化方法
 
-
         // 执行初始化之前的BeanPostProcessor后置
         wrappedBean = applyBeanPostProcessorsAfterInitialization(bean , beanName);
-
     }
-
 
     /**
      * 创建并返回一个Bean实例
@@ -86,10 +90,9 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         return getInstantiationStrategy().instantiate(beanDefinition);
     }
 
-
     /**
+     * 应用属性值
      * 根据BeanDefinition中的属性信息，为指定的bean对象应用属性值
-     * 此方法主要用于依赖注入过程，通过反射机制将属性值注入到bean实例中
      *
      * @param bean 要应用属性值的目标bean对象
      * @param beanDefinition 包含bean定义和属性信息的对象
@@ -97,7 +100,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
      */
     private void applyPropertyValues(Object bean, BeanDefinition beanDefinition, String beanName) {
         try {
-            // 获取到要操作Bean到Class对象
+            // 获取要操作Bean的Class对象
             Class beanClass = beanDefinition.getBeanClass();
 
             // 循环获取当前Bean的所有属性
@@ -106,36 +109,33 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
                 String name = propertyValue.getName();
                 Object value = propertyValue.getValue();
 
-                // 如果是Bean
+                // 如果是Bean引用，则获取对应的Bean实例
                 if (value instanceof BeanReference){
                     value = super.getBean(name);
                 }
 
-
-                //通过属性的set方法设置属性
+                // 通过属性的set方法设置属性
                 String setMethodName = "set" + name.substring(0, 1).toUpperCase() + name.substring(1);
                 Class<?> type = beanClass.getDeclaredField(name).getType();
 
                 // 通过反射动态调用
                 Method declaredMethod = beanClass.getDeclaredMethod(setMethodName, type);
                 declaredMethod.invoke(bean, value);
-                // BeanUtil.setFieldValue(bean, name, value);
             }
         }catch (Exception e){
             throw new BeanException(String.format("bean 属性注入异常[%s]",beanName) ,  e);
         }
     }
 
-
+    // 获取实例化策略
     public InstantiationStrategy getInstantiationStrategy() {
         return instantiationStrategy;
     }
 
+    // 设置实例化策略
     public void setInstantiationStrategy(InstantiationStrategy instantiationStrategy) {
         this.instantiationStrategy = instantiationStrategy;
     }
-    
-    
 
     /**
      * 在Bean初始化之前执行BeanPostProcessors的增强方法

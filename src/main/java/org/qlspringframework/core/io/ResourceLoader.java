@@ -1,6 +1,9 @@
 package org.qlspringframework.core.io;
+
 /**
- * @description: 资源加载器，用于加载Resource的实现类
+ * ResourceLoader接口用于定义资源加载的通用规范
+ * 它提供了一种统一的资源访问方式，使得应用程序可以灵活地从不同的位置加载资源
+ *
  * @author: jixu
  * @create: 2025-04-09 10:49
  **/

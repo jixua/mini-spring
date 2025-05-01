@@ -11,6 +11,8 @@ import org.qlspringframework.beans.ioc.bean.Car;
 import org.qlspringframework.beans.ioc.bean.People;
 
 /**
+ * Bean属性值和引用的测试类。
+ * 该类包含两个测试方法，一个用于测试Bean的属性值，另一个用于测试Bean的属性引用。
  * @author jixu
  * @title BeanPropertyValueTest
  * @date 2025/4/7 10:08

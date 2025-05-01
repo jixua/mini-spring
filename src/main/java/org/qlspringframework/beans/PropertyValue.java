@@ -1,7 +1,7 @@
 package org.qlspringframework.beans;
 
 /**
- * Bean属性
+ * 主要用于在Bean定义中描述单个属性的名称和值。
  *
  * @author jixu
  * @title PropertyValue

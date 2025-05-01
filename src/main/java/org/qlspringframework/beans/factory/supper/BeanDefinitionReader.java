@@ -4,10 +4,10 @@ import org.qlspringframework.core.io.Resource;
 import org.qlspringframework.core.io.ResourceLoader;
 
 /**
- * @description: 用于将资源文件加载为BeanDefinition，是对BeanDefinitionRegister与ResourceLoad的实现
- * @author: jixu
- * @create: 2025-04-10 14:05
- **/
+ * BeanDefinitionReader接口用于读取和加载Bean定义。
+ * 它提供了获取BeanDefinitionRegister和ResourceLoader实例的方法，
+ * 以及根据资源位置或Resource对象加载Bean定义的方法。
+ */
 public interface BeanDefinitionReader {
 
     /**
@@ -21,8 +21,6 @@ public interface BeanDefinitionReader {
      * @return ResourceLoader 用于加载资源的实例
      */
     ResourceLoader getResourceLoad();
-
-
 
     /**
      * 根据指定的资源位置加载BeanDefinition。

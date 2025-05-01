@@ -16,21 +16,31 @@ import org.w3c.dom.NodeList;
 import java.io.InputStream;
 
 /**
- * @description: Xml解析方法的具体实现
+ * XMLBean定义读取器
+ * 该类负责从XML配置文件中读取Bean定义，并注册到BeanDefinitionRegister中
+ *
  * @author: jixu
  * @create: 2025-04-10 14:31
  **/
 public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 
+    // 定义XML中Bean标签的元素名称
     public static final String BEAN_ELEMENT = "bean";
+    // 定义XML中属性标签的元素名称
     public static final String PROPERTY_ELEMENT = "property";
+    // 定义XML中ID属性的名称
     public static final String ID_ATTRIBUTE = "id";
+    // 定义XML中名称属性的名称
     public static final String NAME_ATTRIBUTE = "name";
+    // 定义XML中类属性的名称
     public static final String CLASS_ATTRIBUTE = "class";
+    // 定义XML中值属性的名称
     public static final String VALUE_ATTRIBUTE = "value";
+    // 定义XML中引用属性的名称
     public static final String REF_ATTRIBUTE = "ref";
 
     /**
+     * 构造函数
      * beanDefinitionRegister是用来注册BeanDefinition使用的
      * 其子类DefaultListableBeanFactory实现了beanDefinitionRegister与BeanFactory
      * 可以通过DefaultListableBeanFactory获取、创建Bean
@@ -40,7 +50,6 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
     public XmlBeanDefinitionReader(BeanDefinitionRegister beanDefinitionRegister) {
         super(beanDefinitionRegister);
     }
-
 
     /**
      * 根据指定的资源位置加载BeanDefinition。
@@ -55,7 +64,6 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
         this.loadBeanDefinitions(resource);
     }
 
-
     /**
      * 根据指定的Resource对象加载BeanDefinition。
      *
@@ -67,7 +75,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
             InputStream inputStream = resource.getInputStream();
             try {
                 doLoadBeanDefinitions(inputStream);
-            }finally {
+            } finally {
                 inputStream.close();
             }
         } catch (Exception e) {
@@ -75,6 +83,13 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
         }
     }
 
+    /**
+     * 实际加载Bean定义的方法
+     * 该方法解析XML文档，提取Bean定义信息，并将它们注册到BeanDefinitionRegister
+     *
+     * @param inputStream XML资源的输入流
+     * @throws Exception 解析XML或注册Bean定义时可能抛出的异常
+     */
     protected void doLoadBeanDefinitions(InputStream inputStream) throws Exception {
         Document document = XmlUtil.readXML(inputStream);
         Element root = document.getDocumentElement();

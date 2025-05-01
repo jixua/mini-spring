@@ -14,4 +14,5 @@ import org.qlspringframework.beans.factory.ListableBeanFactory;
  * 该接口通常用于在 Spring 应用程序中获取 Bean 实例、管理 Bean 的生命周期以及加载资源。
  */
 public interface ApplicationContext extends ListableBeanFactory , HierarchicalBeanFactory  {
+
 }

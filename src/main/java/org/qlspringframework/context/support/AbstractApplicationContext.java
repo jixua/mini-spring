@@ -43,6 +43,13 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 
     }
 
+    /**
+     * 注册BeanPostProcessor。
+     * 该方法从BeanFactory中获取所有BeanPostProcessor类型的Bean，并将它们添加到BeanFactory中。
+     * 这样做是为了确保这些处理器能够在Bean的生命周期中被调用。
+     *
+     * @param beanFactory ConfigurableListableBeanFactory类型的参数，用于获取和添加BeanPostProcessor
+     */
     private void registerBeanPostProcessors(ConfigurableListableBeanFactory beanFactory) {
         Map<String, BeanPostProcessor> beanPostProcessorMap = beanFactory.getBeanOfType(BeanPostProcessor.class);
         for (BeanPostProcessor beanPostProcessor : beanPostProcessorMap.values()) {
@@ -50,6 +57,13 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
         }
     }
 
+    /**
+     * 调用BeanFactoryPostProcessor的方法。
+     * 该方法从BeanFactory中获取所有BeanFactoryPostProcessor类型的Bean，并调用它们的postProcessBeanFactory方法。
+     * 这允许这些处理器在BeanFactory初始化后对BeanFactory进行进一步的处理。
+     *
+     * @param beanFactory ConfigurableListableBeanFactory类型的参数，用于获取BeanFactoryPostProcessor并调用其方法
+     */
     private void invokeBeanFactoryPostProcessors(ConfigurableListableBeanFactory beanFactory) {
         // 获取到所有已注册到容器当中的BeanPostProcess
         Map<String, BeanFactoryPostProcessor> beanFactoryPostProcessorMap = beanFactory.getBeanOfType(BeanFactoryPostProcessor.class);
@@ -60,8 +74,18 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
     }
 
 
+    /**
+     * 抽象方法，由子类实现。
+     * 用于刷新BeanFactory，包括重新加载Bean定义等操作。
+     */
     protected abstract void refreshBeanFactory();
 
+    /**
+     * 抽象方法，由子类实现。
+     * 用于获取当前应用程序上下文中使用的BeanFactory。
+     *
+     * @return 返回ConfigurableListableBeanFactory类型的BeanFactory实例
+     */
     protected abstract ConfigurableListableBeanFactory  getBeanFactory();
 
     /**

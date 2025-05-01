@@ -6,16 +6,15 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * @description: 注册和管理单例 Bean 的实例
+ * 默认的单例Bean注册表实现类
+ *
  * @author: jixu
  * @create: 2025-03-28 15:41
  **/
 public class DefaultSingletonBeanRegistry implements SingletonBeanRegistry {
 
-
     // 保存单列Bean的地方
     private Map<String , Object> singletonObjects = new ConcurrentHashMap<>();
-
 
     /**
      * 获取单列Bean
@@ -31,7 +30,8 @@ public class DefaultSingletonBeanRegistry implements SingletonBeanRegistry {
     /**
      * 添加单列Bean
      *
-     * @param bean
+     * @param baenName Bean名称
+     * @param bean Bean对象
      */
     @Override
     public void addSingletonBean(String baenName , Object bean) {
