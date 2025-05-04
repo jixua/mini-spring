@@ -1,7 +1,11 @@
 package org.qlspringframework.beans.factory.supper;
 
-import org.qlspringframework.beans.BeanException;
+import cn.hutool.core.util.ClassUtil;
+import cn.hutool.core.util.StrUtil;
+import org.qlspringframework.beans.BeansException;
 import org.qlspringframework.beans.PropertyValue;
+import org.qlspringframework.beans.factory.DisposableBean;
+import org.qlspringframework.beans.factory.InitializingBean;
 import org.qlspringframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.qlspringframework.beans.factory.config.BeanDefinition;
 import org.qlspringframework.beans.factory.config.BeanPostProcessor;
@@ -40,7 +44,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
      * 如何创建Bean？
      * 通过beanDefinition当中保存的Bean的Class对象，通过反射的方式创建Bean
      */
-    private Object doCreateBean(String beanName, BeanDefinition beanDefinition) throws BeanException {
+    private Object doCreateBean(String beanName, BeanDefinition beanDefinition) throws BeansException {
         // 通过反射创建对象
         Object bean = null;
         try {
@@ -51,15 +55,23 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
             applyPropertyValues(bean , beanDefinition , beanName);
 
             // 执行bean的初始化方法和BeanPostProcessor的前置和后置处理方法
-            initializeBean(beanName , bean);
+            initializeBean(beanName , bean,beanDefinition);
         } catch (Exception e) {
-            throw new BeanException(e.getMessage());
+            throw new BeansException(e.getMessage());
         }
+        // 注册带有销毁方法的Bean
+        registerDisposableBeanIfNecessary(beanName, bean, beanDefinition);
 
         // 创建完毕后加入缓存
         super.addSingletonBean(beanName, bean);
 
         return bean;
+    }
+
+    private void registerDisposableBeanIfNecessary(String beanName, Object bean, BeanDefinition beanDefinition) {
+        if (bean instanceof DisposableBean || StrUtil.isNotEmpty(beanDefinition.getDestroyMethodName())){
+            super.registerDisposableBean(beanName,new DisposableBeanAdapter(bean,beanName, beanDefinition.getDestroyMethodName()));
+        }
     }
 
     /**
@@ -69,14 +81,34 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
      * @param beanName Bean名称
      * @param bean Bean实例
      */
-    private void initializeBean(String beanName, Object bean) {
+    private void initializeBean(String beanName, Object bean,BeanDefinition beanDefinition) {
         // 执行初始化之前的BeanPostProcessor前置处理
         Object wrappedBean  = applyBeanPostProcessorsBeforeInitialization(bean, beanName);
 
         // 执行初始化方法
+        try {
+            invokeInitMethods(beanName , wrappedBean , beanDefinition);
+        } catch (Exception e) {
+            throw new BeansException("调用 bean 的 init 方法[" + beanName + "] 失败", e);
+        }
 
         // 执行初始化之前的BeanPostProcessor后置
         wrappedBean = applyBeanPostProcessorsAfterInitialization(bean , beanName);
+    }
+
+    private void invokeInitMethods(String beanName, Object bean, BeanDefinition beanDefinition) throws Exception{
+        if (bean instanceof InitializingBean){
+            ((InitializingBean) bean).afterPropertiesSet();
+        }
+
+        // 处理用户自定义的初始化方法
+        if (StrUtil.isNotEmpty(beanDefinition.getInitMethodName())){
+            Method initMethod = ClassUtil.getPublicMethod(bean.getClass(), beanDefinition.getInitMethodName());
+            if (initMethod == null) {
+                throw new BeansException(String.format("在Bean：%s 当中找不到名为：%s 的初始化方法",beanName,beanDefinition.getInitMethodName()));
+            }
+            initMethod.invoke(bean);
+        }
     }
 
     /**
@@ -123,7 +155,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
                 declaredMethod.invoke(bean, value);
             }
         }catch (Exception e){
-            throw new BeanException(String.format("bean 属性注入异常[%s]",beanName) ,  e);
+            throw new BeansException(String.format("bean 属性注入异常[%s]",beanName) ,  e);
         }
     }
 

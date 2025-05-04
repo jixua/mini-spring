@@ -1,6 +1,6 @@
 package org.qlspringframework.beans.factory.supper;
 
-import org.qlspringframework.beans.BeanException;
+import org.qlspringframework.beans.BeansException;
 import org.qlspringframework.beans.factory.config.BeanDefinition;
 import org.qlspringframework.beans.factory.config.BeanPostProcessor;
 import org.qlspringframework.beans.factory.config.ConfigurableBeanFactory;
@@ -62,7 +62,7 @@ public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry i
         BeanDefinition beanDefinition = getBeanDefinition(beanName);
 
         if (beanDefinition == null){
-            throw new BeanException("beanDefinition is null");
+            throw new BeansException("beanDefinition is null");
         }
 
         // 创建Bean

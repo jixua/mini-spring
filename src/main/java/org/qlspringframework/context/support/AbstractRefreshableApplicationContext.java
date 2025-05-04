@@ -13,7 +13,7 @@ import org.qlspringframework.beans.factory.supper.DefaultListableBeanFactory;
 public abstract class AbstractRefreshableApplicationContext extends AbstractApplicationContext{
 
     // 应用上下文中使用的Bean工厂
-    private ConfigurableListableBeanFactory  beanFactory;
+    private DefaultListableBeanFactory  beanFactory;
 
     /**
      * 刷新Bean工厂，主要用于创建和初始化Bean

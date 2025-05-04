@@ -39,6 +39,10 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
     // 定义XML中引用属性的名称
     public static final String REF_ATTRIBUTE = "ref";
 
+    private static final String INIT_METHOD_ATTRIBUTE = "init-method";
+
+    private static final String DESTROY_METHOD_ATTRIBUTE = "destroy-method";
+
     /**
      * 构造函数
      * beanDefinitionRegister是用来注册BeanDefinition使用的
@@ -102,6 +106,8 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
                     String id = bean.getAttribute(ID_ATTRIBUTE);
                     String name = bean.getAttribute(NAME_ATTRIBUTE);
                     String className = bean.getAttribute(CLASS_ATTRIBUTE);
+                    String initMethodName = bean.getAttribute(INIT_METHOD_ATTRIBUTE);
+                    String destroyMethodName = bean.getAttribute(DESTROY_METHOD_ATTRIBUTE);
 
                     Class<?> clazz = Class.forName(className);
                     //id优先于name
@@ -112,6 +118,8 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
                     }
 
                     BeanDefinition beanDefinition = new BeanDefinition(clazz);
+                    beanDefinition.setInitMethodName(initMethodName);
+                    beanDefinition.setDestroyMethodName(destroyMethodName);
 
                     for (int j = 0; j < bean.getChildNodes().getLength(); j++) {
                         if (bean.getChildNodes().item(j) instanceof Element) {

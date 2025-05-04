@@ -1,10 +1,12 @@
 package org.qlspringframework.beans.factory.config;
 
+import org.qlspringframework.beans.factory.BeanFactory;
+
 /**
  * 定义了一个接口，用于 Bean 的自动装配和生命周期管理
  * 主要负责在 Bean 初始化前后应用 BeanPostProcessor 的增强方法
  */
-public interface AutowireCapableBeanFactory {
+public interface AutowireCapableBeanFactory extends BeanFactory {
 
     /**
      * 在 Bean 初始化之前执行 BeanPostProcessors 的增强方法

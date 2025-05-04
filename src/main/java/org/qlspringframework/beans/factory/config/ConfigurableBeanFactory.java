@@ -1,6 +1,7 @@
 package org.qlspringframework.beans.factory.config;
 
 import org.qlspringframework.beans.factory.BeanFactory;
+import org.qlspringframework.beans.factory.HierarchicalBeanFactory;
 
 /**
  * ConfigurableBeanFactory 接口扩展了 BeanFactory 和 SingletonBeanRegister 接口，
@@ -9,7 +10,7 @@ import org.qlspringframework.beans.factory.BeanFactory;
  * @author jixu
  * @create 2025-04-11 15:42
  */
-public interface ConfigurableBeanFactory extends BeanFactory, SingletonBeanRegistry {
+public interface ConfigurableBeanFactory extends HierarchicalBeanFactory, SingletonBeanRegistry {
 
     /**
      * 添加一个 BeanPostProcessor 到工厂中。
@@ -18,4 +19,10 @@ public interface ConfigurableBeanFactory extends BeanFactory, SingletonBeanRegis
      * @param beanPostProcessor 要添加的 BeanPostProcessor 实例
      */
     void addBeanPostProcessor(BeanPostProcessor beanPostProcessor);
+
+
+    /**
+     * 销毁单例bean
+     */
+    void destroySingletons();
 }

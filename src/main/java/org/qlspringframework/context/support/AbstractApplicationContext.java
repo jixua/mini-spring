@@ -43,6 +43,30 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 
     }
 
+
+    /**
+     * 关闭ApplicationContext
+     */
+    @Override
+    public void close() {
+        doClose();
+    }
+
+    private void doClose() {
+        destroyBeans();
+
+    }
+
+    private void destroyBeans() {
+        getBeanFactory().destroySingletons();
+    }
+
+    @Override
+    public void registerShutdownHook() {
+        Thread shutdownHook = new Thread(this::doClose);
+        Runtime.getRuntime().addShutdownHook(shutdownHook);
+    }
+
     /**
      * 注册BeanPostProcessor。
      * 该方法从BeanFactory中获取所有BeanPostProcessor类型的Bean，并将它们添加到BeanFactory中。

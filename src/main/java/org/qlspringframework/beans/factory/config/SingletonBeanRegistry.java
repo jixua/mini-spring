@@ -21,4 +21,6 @@ public interface SingletonBeanRegistry {
      * @param bean Bean对象
      */
     void addSingletonBean(String beanName, Object bean);
+
+
 }

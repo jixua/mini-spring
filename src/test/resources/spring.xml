@@ -17,7 +17,6 @@
     </bean>
 
     <bean id="beanPostProcessor" class="org.qlspringframework.beans.ioc.common.CustomerBeanPostProcessor">
-
     </bean>
 
 </beans>

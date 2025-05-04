@@ -1,6 +1,6 @@
 package org.qlspringframework.context;
 
-import org.qlspringframework.beans.BeanException;
+import org.qlspringframework.beans.BeansException;
 
 /**
  * 当应用上下文(ApplicationContext)中发生异常时抛出此异常
@@ -9,7 +9,7 @@ import org.qlspringframework.beans.BeanException;
  * @author: jixu
  * @create: 2025-04-19 14:33
  **/
-public class ApplicationContextException extends BeanException {
+public class ApplicationContextException extends BeansException {
 
     /**
      * 构造一个应用上下文异常，包含一个简单的消息

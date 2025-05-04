@@ -1,11 +1,14 @@
 package org.qlspringframework.beans.ioc.bean;
 
+import org.qlspringframework.beans.factory.DisposableBean;
+import org.qlspringframework.beans.factory.InitializingBean;
+
 /**
  * @author jixu
  * @title People
  * @date 2025/4/7 09:54
  */
-public class People {
+public class People implements DisposableBean, InitializingBean {
 
     private String name;
     private Integer age;
@@ -43,5 +46,15 @@ public class People {
                 ", age=" + age +
                 ", car=" + car +
                 '}';
+    }
+
+    @Override
+    public void destroy() {
+        System.out.println("People destroy");
+    }
+
+    @Override
+    public void afterPropertiesSet() {
+        System.out.println("People init");
     }
 }

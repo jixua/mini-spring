@@ -13,4 +13,12 @@ public interface ConfigurableApplicationContext extends ApplicationContext {
      * 刷新容器，重新加载并初始化所有配置和Bean
      */
     void refresh();
+
+    /**
+     * 关闭ApplicationContext
+     */
+    void close();
+
+
+    void registerShutdownHook();
 }

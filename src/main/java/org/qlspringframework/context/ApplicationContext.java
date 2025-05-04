@@ -2,6 +2,7 @@ package org.qlspringframework.context;
 
 import org.qlspringframework.beans.factory.HierarchicalBeanFactory;
 import org.qlspringframework.beans.factory.ListableBeanFactory;
+import org.qlspringframework.core.io.ResourceLoader;
 
 /**
  * ApplicationContext 接口是 Spring 框架中的核心接口之一，用于提供应用程序的配置信息。
@@ -13,6 +14,6 @@ import org.qlspringframework.beans.factory.ListableBeanFactory;
  *
  * 该接口通常用于在 Spring 应用程序中获取 Bean 实例、管理 Bean 的生命周期以及加载资源。
  */
-public interface ApplicationContext extends ListableBeanFactory , HierarchicalBeanFactory  {
+public interface ApplicationContext extends ListableBeanFactory , HierarchicalBeanFactory , ResourceLoader {
 
 }

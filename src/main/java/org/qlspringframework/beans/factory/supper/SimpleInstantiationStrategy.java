@@ -1,6 +1,6 @@
 package org.qlspringframework.beans.factory.supper;
 
-import org.qlspringframework.beans.BeanException;
+import org.qlspringframework.beans.BeansException;
 import org.qlspringframework.beans.factory.config.BeanDefinition;
 
 import java.lang.reflect.Constructor;
@@ -29,7 +29,7 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy{
             return declaredConstructor.newInstance();
         } catch (Exception e) {
             // 如果实例化过程中发生异常，抛出BeanException
-            throw new BeanException(e.getMessage());
+            throw new BeansException(e.getMessage());
         }
     }
 }

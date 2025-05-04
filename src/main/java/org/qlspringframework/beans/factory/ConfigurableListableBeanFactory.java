@@ -1,7 +1,9 @@
 package org.qlspringframework.beans.factory;
 
+import org.qlspringframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.qlspringframework.beans.factory.config.BeanDefinition;
 import org.qlspringframework.beans.factory.config.BeanPostProcessor;
+import org.qlspringframework.beans.factory.config.ConfigurableBeanFactory;
 
 /**
  * ConfigurableListableBeanFactory 接口扩展了 ListableBeanFactory 接口，提供了对 Bean 工厂的配置和列表功能。
@@ -10,11 +12,10 @@ import org.qlspringframework.beans.factory.config.BeanPostProcessor;
  * @author: jixu
  * @create: 2025-04-11 15:00
  **/
-public interface ConfigurableListableBeanFactory extends ListableBeanFactory {
+public interface ConfigurableListableBeanFactory extends ListableBeanFactory , AutowireCapableBeanFactory, ConfigurableBeanFactory {
 
     // 该接口目前没有定义具体的方法，但通常用于扩展 Bean 工厂的功能，
     // 例如配置 Bean 的定义、管理 Bean 的生命周期、处理 Bean 的依赖关系等。
-
     BeanDefinition getBeanDefinition(String beanNane);
 
     void addBeanPostProcessor(BeanPostProcessor beanPostProcessor);

@@ -20,6 +20,30 @@ public class BeanDefinition {
     // Bean属性列表
     private PropertyValues propertyValues;
 
+    private String destroyMethodName;
+
+    private String initMethodName;
+
+
+
+
+
+    public String getDestroyMethodName() {
+        return destroyMethodName;
+    }
+
+    public void setDestroyMethodName(String destroyMethodName) {
+        this.destroyMethodName = destroyMethodName;
+    }
+
+    public String getInitMethodName() {
+        return initMethodName;
+    }
+
+    public void setInitMethodName(String initMethodName) {
+        this.initMethodName = initMethodName;
+    }
+
     /**
      * 获取Bean的属性列表
      *
