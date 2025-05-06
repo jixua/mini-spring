@@ -23,7 +23,6 @@ public void testBeanPostPostProcess() {
 在这里我们创建了一个BeanFactory对象之后还需要，手动调用方法加载资源文件，同时对于PostProcess也需要我们通过内置方法进行添加，那能否实现自动化的添加就是ApplicationContext要做的事情
 
 
-## ApplicationContext实现原理
 
 其实ApplicationContext的实现与BeanFactory非常类似，都是通过对子类的委托实现功能的拓展。
 
