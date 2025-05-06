@@ -35,6 +35,7 @@ public class DefaultSingletonBeanRegistry implements SingletonBeanRegistry {
             DisposableBean disposableBean = disposableBeans.remove(beanName);
             // 执行销毁方法
             disposableBean.destroy();
+            // 删除缓存当中的
         }
 
     }

@@ -70,6 +70,11 @@ public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry i
 
     }
 
+    @Override
+    public <T> T getBean(String name, Class<T> requiredType) {
+        return  ((T) getBean(name));
+
+    }
 
     /**
      * 创建Bean的抽象方法，由子类实现具体逻辑

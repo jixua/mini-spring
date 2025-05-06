@@ -32,6 +32,11 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
         // 获取到Bean工厂
         ConfigurableListableBeanFactory beanFactory = getBeanFactory();
 
+        // 对于ApplicationContextAware来说是作用在单个Bean当中的，其中ApplicationContext无法指定在哪个Bean当中生效
+        // 在这里可以通过BeanPostProcessor实现，此时的ApplicationContextAwarePostProcessor类似于一个中间件，将对象存储在当中
+        // 当PostProcessor接口识别到该类型的Bean则会将其注入进去
+        beanFactory.addBeanPostProcessor(new ApplicationContextAwareProcessor(this));
+
         // 执行BeanFactoryPostProcess的方法
         invokeBeanFactoryPostProcessors(beanFactory);
 
@@ -143,6 +148,11 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
     @Override
     public Object getBean(String name) {
         return getBeanFactory().getBean(name);
+    }
+
+    @Override
+    public <T> T getBean(String name, Class<T> requiredType) {
+        return getBeanFactory().getBean(name,requiredType);
     }
 }
 
