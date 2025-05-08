@@ -7,6 +7,8 @@ import org.qlspringframework.beans.factory.InitializingBean;
 import org.qlspringframework.context.ApplicationContext;
 import org.qlspringframework.context.ApplicationContextAware;
 
+import java.util.HashMap;
+
 /**
  * @author jixu
  * @title People

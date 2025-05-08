@@ -11,6 +11,12 @@ import org.qlspringframework.beans.PropertyValues;
  **/
 public class BeanDefinition {
 
+    public static String SCOPE_SINGLETON = "singleton";
+
+    public static String SCOPE_PROTOTYPE = "prototype";
+
+    private String scope = SCOPE_SINGLETON;
+
     // Bean名称
     private String beanName;
 
@@ -23,6 +29,26 @@ public class BeanDefinition {
     private String destroyMethodName;
 
     private String initMethodName;
+
+    // 单列模式
+    private boolean singleton = true;
+
+    // 多列模式
+    private boolean prototype = false;
+
+    public void setScope(String scope){
+        this.scope = scope;
+        this.singleton = SCOPE_SINGLETON.equals(scope);
+        this.prototype = SCOPE_PROTOTYPE.equals(scope);
+    }
+
+    public boolean isSingleton() {
+        return this.singleton;
+    }
+
+    public boolean isPrototype() {
+        return this.prototype;
+    }
 
 
 

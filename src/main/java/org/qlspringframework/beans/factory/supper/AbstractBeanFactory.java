@@ -62,7 +62,7 @@ public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry i
         BeanDefinition beanDefinition = getBeanDefinition(beanName);
 
         if (beanDefinition == null){
-            throw new BeansException("beanDefinition is null");
+            throw new BeansException("beanDefinition 为空");
         }
 
         // 创建Bean

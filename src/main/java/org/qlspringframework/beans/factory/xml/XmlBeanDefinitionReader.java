@@ -1,7 +1,13 @@
 package org.qlspringframework.beans.factory.xml;
 
+
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.XmlUtil;
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.Element;
+import org.dom4j.io.SAXReader;
+import org.qlspringframework.beans.BeansException;
 import org.qlspringframework.beans.PropertyValue;
 import org.qlspringframework.beans.factory.config.BeanDefinition;
 import org.qlspringframework.beans.factory.config.BeanReference;
@@ -9,11 +15,12 @@ import org.qlspringframework.beans.factory.supper.AbstractBeanDefinitionReader;
 import org.qlspringframework.beans.factory.supper.BeanDefinitionRegister;
 import org.qlspringframework.core.io.Resource;
 import org.qlspringframework.core.io.ResourceLoader;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
+
 
 import java.io.InputStream;
+import java.util.List;
+
+
 
 /**
  * XMLBean定义读取器
@@ -38,6 +45,8 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
     public static final String VALUE_ATTRIBUTE = "value";
     // 定义XML中引用属性的名称
     public static final String REF_ATTRIBUTE = "ref";
+
+    public static final String SCOPE_ATTRIBUTE = "scope";
 
     private static final String INIT_METHOD_ATTRIBUTE = "init-method";
 
@@ -94,54 +103,63 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
      * @param inputStream XML资源的输入流
      * @throws Exception 解析XML或注册Bean定义时可能抛出的异常
      */
-    protected void doLoadBeanDefinitions(InputStream inputStream) throws Exception {
-        Document document = XmlUtil.readXML(inputStream);
-        Element root = document.getDocumentElement();
-        NodeList childNodes = root.getChildNodes();
-        for (int i = 0; i < childNodes.getLength(); i++) {
-            if (childNodes.item(i) instanceof Element) {
-                if (BEAN_ELEMENT.equals(((Element) childNodes.item(i)).getNodeName())) {
-                    //解析bean标签
-                    Element bean = (Element) childNodes.item(i);
-                    String id = bean.getAttribute(ID_ATTRIBUTE);
-                    String name = bean.getAttribute(NAME_ATTRIBUTE);
-                    String className = bean.getAttribute(CLASS_ATTRIBUTE);
-                    String initMethodName = bean.getAttribute(INIT_METHOD_ATTRIBUTE);
-                    String destroyMethodName = bean.getAttribute(DESTROY_METHOD_ATTRIBUTE);
+    protected void doLoadBeanDefinitions(InputStream inputStream) throws DocumentException {
+        SAXReader reader = new SAXReader();
+        Document document = reader.read(inputStream);
 
-                    Class<?> clazz = Class.forName(className);
-                    //id优先于name
-                    String beanName = StrUtil.isNotEmpty(id) ? id : name;
-                    if (StrUtil.isEmpty(beanName)) {
-                        //如果id和name都为空，将类名的第一个字母转为小写后作为bean的名称
-                        beanName = StrUtil.lowerFirst(clazz.getSimpleName());
-                    }
+        Element beans = document.getRootElement();
+        List<Element> beanList = beans.elements(BEAN_ELEMENT);
+        for (Element bean : beanList) {
+            String beanId = bean.attributeValue(ID_ATTRIBUTE);
+            String beanName = bean.attributeValue(NAME_ATTRIBUTE);
+            String className = bean.attributeValue(CLASS_ATTRIBUTE);
+            String initMethodName = bean.attributeValue(INIT_METHOD_ATTRIBUTE);
+            String destroyMethodName = bean.attributeValue(DESTROY_METHOD_ATTRIBUTE);
+            String beanScope = bean.attributeValue(SCOPE_ATTRIBUTE);
 
-                    BeanDefinition beanDefinition = new BeanDefinition(clazz);
-                    beanDefinition.setInitMethodName(initMethodName);
-                    beanDefinition.setDestroyMethodName(destroyMethodName);
-
-                    for (int j = 0; j < bean.getChildNodes().getLength(); j++) {
-                        if (bean.getChildNodes().item(j) instanceof Element) {
-                            if (PROPERTY_ELEMENT.equals(((Element) bean.getChildNodes().item(j)).getNodeName())) {
-                                //解析property标签
-                                Element property = (Element) bean.getChildNodes().item(j);
-                                String nameAttribute = property.getAttribute(NAME_ATTRIBUTE);
-                                String valueAttribute = property.getAttribute(VALUE_ATTRIBUTE);
-                                String refAttribute = property.getAttribute(REF_ATTRIBUTE);
-
-                                Object value = valueAttribute;
-                                if (StrUtil.isNotEmpty(refAttribute)) {
-                                    value = new BeanReference(refAttribute);
-                                }
-                                PropertyValue propertyValue = new PropertyValue(nameAttribute, value);
-                                beanDefinition.getPropertyValues().addPropertyValue(propertyValue);
-                            }
-                        }
-                    }
-                    getRegistry().registerBeanDefinition(beanName, beanDefinition);
-                }
+            Class<?> clazz;
+            try {
+                clazz = Class.forName(className);
+            } catch (ClassNotFoundException e) {
+                throw new BeansException("没有找到类 [" + className + "]");
             }
+            //id优先于name
+            beanName = StrUtil.isNotEmpty(beanId) ? beanId : beanName;
+            if (StrUtil.isEmpty(beanName)) {
+                //如果id和name都为空，将类名的第一个字母转为小写后作为bean的名称
+                beanName = StrUtil.lowerFirst(clazz.getSimpleName());
+            }
+
+            BeanDefinition beanDefinition = new BeanDefinition(clazz);
+            beanDefinition.setInitMethodName(initMethodName);
+            beanDefinition.setDestroyMethodName(destroyMethodName);
+            if (StrUtil.isNotEmpty(beanScope)) {
+                beanDefinition.setScope(beanScope);
+            }
+
+            List<Element> propertyList = bean.elements(PROPERTY_ELEMENT);
+            for (Element property : propertyList) {
+                String propertyNameAttribute = property.attributeValue(NAME_ATTRIBUTE);
+                String propertyValueAttribute = property.attributeValue(VALUE_ATTRIBUTE);
+                String propertyRefAttribute = property.attributeValue(REF_ATTRIBUTE);
+
+                if (StrUtil.isEmpty(propertyNameAttribute)) {
+                    throw new BeansException("name 属性不能为 null 或空");
+                }
+
+                Object value = propertyValueAttribute;
+                if (StrUtil.isNotEmpty(propertyRefAttribute)) {
+                    value = new BeanReference(propertyRefAttribute);
+                }
+                PropertyValue propertyValue = new PropertyValue(propertyNameAttribute, value);
+                beanDefinition.getPropertyValues().addPropertyValue(propertyValue);
+            }
+            if (getRegistry().containsBeanDefinition(beanName)) {
+                //beanName不能重名
+                throw new BeansException("Duplicate beanName[" + beanName + "] is not allowed");
+            }
+            //注册BeanDefinition
+            getRegistry().registerBeanDefinition(beanName, beanDefinition);
         }
     }
 }

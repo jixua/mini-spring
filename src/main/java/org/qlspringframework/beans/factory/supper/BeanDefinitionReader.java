@@ -39,4 +39,7 @@ public interface BeanDefinitionReader {
      * @param resource 资源对象，包含具体的资源信息
      */
     void loadBeanDefinitions(Resource resource);
+
+
+
 }

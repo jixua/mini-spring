@@ -19,4 +19,12 @@ public interface BeanDefinitionRegister {
      * @param beanDefinition Bean的定义，包含Bean的元数据，如类名、作用域、依赖关系等
      */
     void registerBeanDefinition(String beanName , BeanDefinition beanDefinition);
+
+    /**
+     * 检查是否包含指定名称的Bean定义
+     *
+     * @param beanName 要检查的Bean名称
+     * @return 如果包含指定名称的Bean定义则返回true，否则返回false
+     */
+    boolean containsBeanDefinition(String beanName);
 }

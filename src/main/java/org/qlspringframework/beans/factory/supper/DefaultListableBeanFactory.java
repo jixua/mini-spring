@@ -30,6 +30,8 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
         beanDefinitionMap.put(beanName,beanDefinition);
     }
 
+
+
     /**
      * 获取BeanDefinition
      *
@@ -78,5 +80,17 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
     public String[] getBeanDefinitionNames() {
         Set<String> beanDefinitionNames = beanDefinitionMap.keySet();
         return beanDefinitionNames.toArray(new String[beanDefinitionNames.size()]);
+    }
+
+
+    /**
+     * 检查是否包含指定名称的Bean定义
+     *
+     * @param beanName 要检查的Bean名称
+     * @return 如果包含指定名称的Bean定义则返回true，否则返回false
+     */
+    @Override
+    public boolean containsBeanDefinition(String beanName) {
+        return this.beanDefinitionMap.containsKey(beanName);
     }
 }
