@@ -1,10 +1,8 @@
-package org.qlspringframework.beans.ioc;
+package org.qlspringframework.beans.ioc.ioc;
 
 import cn.hutool.core.io.IoUtil;
 import org.junit.Test;
-import org.qlspringframework.core.io.ClassPathResource;
 import org.qlspringframework.core.io.DefaultResourceLoader;
-import org.qlspringframework.core.io.FileSystemResource;
 import org.qlspringframework.core.io.Resource;
 
 import java.io.IOException;

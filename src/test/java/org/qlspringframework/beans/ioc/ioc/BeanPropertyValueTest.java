@@ -1,4 +1,4 @@
-package org.qlspringframework.beans.ioc;
+package org.qlspringframework.beans.ioc.ioc;
 
 import org.assertj.core.api.Assertions;
 import org.junit.Test;

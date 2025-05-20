@@ -1,4 +1,4 @@
-package org.qlspringframework.beans.ioc;
+package org.qlspringframework.beans.ioc.ioc;
 
 import org.junit.Test;
 import org.qlspringframework.beans.ioc.common.CustomEvent;

@@ -1,4 +1,4 @@
-package org.qlspringframework.beans.ioc;
+package org.qlspringframework.beans.ioc.ioc;
 
 import org.junit.Assert;
 import org.junit.Test;
