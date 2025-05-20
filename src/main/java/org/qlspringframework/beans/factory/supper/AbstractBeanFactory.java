@@ -1,12 +1,15 @@
 package org.qlspringframework.beans.factory.supper;
 
 import org.qlspringframework.beans.BeansException;
+import org.qlspringframework.beans.factory.FactoryBean;
 import org.qlspringframework.beans.factory.config.BeanDefinition;
 import org.qlspringframework.beans.factory.config.BeanPostProcessor;
 import org.qlspringframework.beans.factory.config.ConfigurableBeanFactory;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 抽象Bean工厂类，继承了DefaultSingletonBeanRegistry以支持单例Bean的注册和管理，
@@ -21,6 +24,9 @@ public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry i
      * BeanPostProcess是对指定Bean的增强，可以定义多个processors
      */
     private final List<BeanPostProcessor> beanPostProcessors  = new ArrayList<>();
+
+
+    private final Map<String , Object> factoryBeanObjectCache = new HashMap<>();
 
     /**
      * 添加beanPostProcessor
@@ -53,21 +59,62 @@ public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry i
     @Override
     public Object getBean(String beanName) {
         // 尝试从缓存当中获取Bean
-        Object bean = super.getSingletonBean(beanName);
-        if (bean != null){
-            return bean;
+        Object sharedInstance = super.getSingletonBean(beanName);
+        if (sharedInstance != null){
+            return getObjectForBeanInstance(sharedInstance,beanName);
         }
 
         // 如果没有尝试创建Bean,Bean的创建需要通过BeanDefinition
         BeanDefinition beanDefinition = getBeanDefinition(beanName);
 
         if (beanDefinition == null){
-            throw new BeansException("beanDefinition 为空");
+            throw new BeansException("beanDefinition：【" + beanName + "】 为空");
         }
 
         // 创建Bean
-        return createBean(beanName , beanDefinition);
+        Object bean = createBean(beanName, beanDefinition);
 
+        return getObjectForBeanInstance(bean,beanName);
+
+    }
+    /**
+     * 根据Bean实例获取应返回的对象实例
+     * 此方法主要用于处理FactoryBean的实例，以确保正确地获取对象
+     *
+     * @param beanInstance Bean实例，可能是FactoryBean实例
+     * @param beanName Bean的名称，用于标识Bean
+     * @return 返回的对象实例，可能是FactoryBean创建的对象，也可能是Bean实例本身
+     */
+    public Object getObjectForBeanInstance(Object beanInstance,String beanName){
+        // 初始化对象为传入的Bean实例
+        Object object = beanInstance;
+        // 判断是否为FactoryBean实例
+        if (beanInstance instanceof FactoryBean){
+            // 强制转换为FactoryBean类型
+            FactoryBean factoryBean = (FactoryBean) beanInstance;
+
+            try {
+                // 判断FactoryBean是否生成单例Bean
+                if (factoryBean.isSingleton()){
+                    // 尝试从FactoryBean对象缓存中获取对象
+                    object = factoryBeanObjectCache.get(beanName);
+                    // 如果缓存中不存在，则调用FactoryBean的getObject方法创建对象，并存入缓存
+                    if (object == null){
+                        object = factoryBean.getObject();
+                        this.factoryBeanObjectCache.put(beanName,object);
+                    }
+                }else {
+                    // 如果不是单例Bean，直接调用FactoryBean的getObject方法创建对象
+                    object = factoryBean.getObject();
+                }
+            } catch (Exception e) {
+                // 如果FactoryBean在创建对象时抛出异常，重新包装并抛出BeansException
+                throw new BeansException("FactoryBean threw exception on object[" + beanName + "] creation", e);
+            }
+        }
+
+        // 返回最终的对象实例
+        return object;
     }
 
     @Override
