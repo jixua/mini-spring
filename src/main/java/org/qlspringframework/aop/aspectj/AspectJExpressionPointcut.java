@@ -12,12 +12,15 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
+ * AspectJ表达式切点类
+ * 该类主要用于定义AspectJ的切点表达式，以便在面向切面编程（AOP）中
+ * 精确定义哪些方法或代码块需要应用切面逻辑，如日志记录、性能监控等
+ *
  * @author jixu
  * @title AspectJExpressionPointcut
  * @date 2025/5/20 16:33
  */
 public class AspectJExpressionPointcut implements ClassFilter , MethodMatcher , PointCut {
-
 
     // 定义支持的切入函数
     private static final Set<PointcutPrimitive> SUPPORTED_PRIMITIVES = new HashSet<PointcutPrimitive>();
