@@ -6,7 +6,7 @@ import org.qlspringframework.aop.AdvisedSupper;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.lang.reflect.UndeclaredThrowableException;
+
 /**
  * JdkDynamicAopProxy类实现了AopProxy和InvocationHandler接口，
  * 用于通过Java动态代理机制创建代理对象并处理方法调用。
@@ -36,7 +36,9 @@ public class JdkDynamicAopProxy implements AopProxy , InvocationHandler {
      */
     @Override
     public Object getProxy() {
-        return Proxy.newProxyInstance(getClass().getClassLoader(),advisedSupper.getTargetSource().getTargetClass(), this);
+        // Proxy.newProxyInstance() 是jdk提供的静态方法，用于动态创建代理对象
+        // 通过该方法会生成一个实现了目标类接口的代理对象，当调用代理对象的目标方法时，JVM 将调用转发到自定义的InvocationHandler 的 invoke 方法。
+        return Proxy.newProxyInstance(getClass().getClassLoader(),advisedSupper.getTargetSource().getTargetInterfaceClass(), this);
     }
 
     /**

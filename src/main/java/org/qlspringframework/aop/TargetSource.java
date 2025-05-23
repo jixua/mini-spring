@@ -26,7 +26,7 @@ public class TargetSource {
      *
      * @return 目标对象所实现的接口数组
      */
-    public Class<?>[] getTargetClass(){
+    public Class<?>[] getTargetInterfaceClass(){
         return this.target.getClass().getInterfaces();
     }
 
