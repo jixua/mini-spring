@@ -1,3 +1,5 @@
+本章只介绍最简单的AOP基础功能的实现
+
 在聊AOP之前，我们需要明白AOP是什么，以及在Spring当中的实现
 
 参考：
@@ -90,7 +92,6 @@ HelloService proxy = (HelloService) Proxy.newProxyInstance(
 
 调用被代理对象的proxy.sayHello("Alice");方法，由于该类时代理类，此时我们对其方法的调用JDK生成的最终真正的代理类，它继承自Proxy并实现了我们定义的Subject接口，  在实现Subject接口方法的内部，通过反射调用了MyInvocationHandler的invoke方法。
 在MyInvocationHandler当中就会完成对代理类的增强逻辑 
-
 
 
 
@@ -438,7 +439,127 @@ public class JdkDynamicAopProxy implements AopProxy , InvocationHandler {
 ```
 
 
-### 2.2，测试案例
+### 2.2，总结
+
+
+这里来重新梳理一下Jdk动态代理的流程，首先我们当前所实现的动态代理是基于最基础的继承而非注解形势，并且当前的AOP是一个最基础的底层产物，就类似于BeanFactory一样，我们还需要一个类似于ApplicationContext的类对当前的所有逻辑进行统筹才行。
+
+那么我们先来看看到目前为止AOP的执行流程
+
+1. 定义拦截器，实现MethodInterceptor，进行增强
+
+```java
+public class WorldServiceInterceptor implements MethodInterceptor {  
+    @Override  
+    public Object invoke(MethodInvocation methodInvocation) throws Throwable {  
+        System.out.println("before");  
+        Object result = methodInvocation.proceed();  
+        System.out.println("after");  
+        return result;  
+    }  
+}
+```
+
+2. 创建被增强类实例对象，拦截器实例对象
+
+```java
+WorldServiceImpl worldService = new WorldServiceImpl();  
+TargetSource targetSource = new TargetSource(worldService); 
+WorldServiceInterceptor interceptor = new WorldServiceInterceptor();
+```
+
+3. 定义切点表达式，通过AspectJExpressionPointcut进行解析，获取到方法匹配器
+
+```java
+AspectJExpressionPointcut pointcut = new AspectJExpressionPointcut("execution(* service.org.qlspringframework.beans.WorldService.sayHello(..))");  
+MethodMatcher methodMatcher = pointcut.getMethodMatcher();  
+```
+
+4. 将增强类实例对象，拦截器实例对象以及方法匹配器实例对象注入到AdvisedSupper
+
+```java
+advisedSupper.setTargetSource(targetSource);  
+advisedSupper.setMethodInterceptor(interceptor);  
+advisedSupper.setMethodMatcher(methodMatcher);  
+```
+
+
+5. 创建Jdk代理对象传入AdvisedSupper对象，获取到代理类
+
+```java
+JdkDynamicAopProxy jdkDynamicAopProxy = new JdkDynamicAopProxy(advisedSupper);  
+WorldService proxy = (WorldService) jdkDynamicAopProxy.getProxy();  
+```
+
+6. 强转代理类类型，调用对应方法
+
+```java
+WorldService proxy = (WorldService) jdkDynamicAopProxy.getProxy();  
+proxy.sayHello();  
+```
+
+7. 拦截代理类的方法调用，进入JdkDynamicAopProxy所实现的InvocationHandler的invoke方法
+8. 在invoke当中进行判断切点是否正确
+```java
+@Override  
+public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {  
+  
+    // 获取到方法匹配器，通过AspectJExpressionPointcut解析传入的切点表达式，调用对应的matches方法判断是否为被代理类  
+    if (advisedSupper.getMethodMatcher().matches(method,advisedSupper.getTargetSource().getTarget().getClass())){  
+  
+        // 获取到方法拦截器  
+        MethodInterceptor methodInterceptor = advisedSupper.getMethodInterceptor();  
+  
+        // 创建ReflectiveMethodInvocation对象，封装了方法调用的相关信息  
+        ReflectiveMethodInvocation invocation = new ReflectiveMethodInvocation(method, advisedSupper.getTargetSource().getTarget(), args);  
+  
+        // 调用 MethodInterceptor 的 invoke 方法，传入 invocation 作为参数。  
+        // invoke 方法会执行拦截器逻辑，通常通过 invocation.proceed() 调用目标方法或下一个拦截器。  
+        return methodInterceptor.invoke(invocation);  
+  
+    }  
+  
+    // 如果方法匹配器判断当前调用的方法不满足切点表达式，则直接调用目标方法  
+    return method.invoke(advisedSupper.getTargetSource().getTarget(),args);  
+}
+```
+
+
+9. 如果正确获取到adviceSupper当中保存到MethodInterceptor方法拦截器，调用增强逻辑
+
+```java
+@Override  
+public Object invoke(MethodInvocation methodInvocation) throws Throwable {  
+    System.out.println("before");  
+    Object result = methodInvocation.proceed();  
+    System.out.println("after");  
+    return result;  
+}
+```
+
+在调用invoke方法的过程当中会传入参数MethodInvocation methodInvocation，其中methodInvocation.proceed()方法通过 **责任链模式（Interceptor Chain）+ Java 反射** 实现，`proceed()` 方法会按顺序调用下一个拦截器，直到最终通过反射调用原始方法。
+
+假设你有两个拦截器
+
+[LogInterceptor, TransactionInterceptor]
+
+调用栈如下：
+
+```scss
+LogInterceptor.invoke() {
+    -> proceed()
+        -> TransactionInterceptor.invoke() {
+            -> proceed()
+                -> method.invoke(target, args) // 原始方法
+        }
+}
+
+```
+
+这是理论上对于AOP的设计，但是当前只支持单个拦截器的拦截调用，后续会逐步添加。
+
+
+### 2.3，测试案例
 
 ```java
 public interface WorldService {  
@@ -480,7 +601,7 @@ public class DynamicProxyTest {
         WorldServiceInterceptor interceptor = new WorldServiceInterceptor();  
         advisedSupper.setMethodInterceptor(interceptor);  
         // "execution(* org.springframework.test.service.WorldService.explode(..))"  
-        AspectJExpressionPointcut pointcut = new AspectJExpressionPointcut("execution(* org.qlspringframework.beans.ioc.service.WorldService.sayHello(..))");  
+        AspectJExpressionPointcut pointcut = new AspectJExpressionPointcut("execution(* service.org.qlspringframework.beans.WorldService.sayHello(..))");  
         MethodMatcher methodMatcher = pointcut.getMethodMatcher();  
         advisedSupper.setMethodMatcher(methodMatcher);  
   
@@ -493,144 +614,143 @@ public class DynamicProxyTest {
 }
 ```
 
-## 3，JDK动态代理相关接口的内容补充
+# 二，Cglib动态代理
 
+Cglib动态代理和Jdk动态代理的实现并无太多的不同，二者之家的区别只在于底层实现方式。
 
-### 1.1，MethodInvocation
+直接看实现代码
 
+#CglibDynamicAopProxy
 
-#### 作用
-
-`MethodInvocation` 是一个接口，用于封装方法调用的上下文信息，主要用于 AOP 拦截器链的执行。它提供了以下功能：
-- 保存目标方法、目标对象、参数等信息。
-- 提供 `proceed()` 方法，用于继续执行拦截器链或目标方法。
-- 支持获取方法调用的元信息（如方法名、参数等）。
-
-#### 接口定义
 ```java
-public interface MethodInvocation extends Invocation {
-    Method getMethod();
-    Object proceed() throws Throwable;
+public class CglibDynamicAopProxy implements AopProxy {  
+  
+    // AdvisedSupper 对象中包含了目标类的信息以及切面的配置  
+    private final AdvisedSupper advisedSupper;  
+  
+    // 构造方法，初始化 CglibDynamicAopProxy 对象  
+    public CglibDynamicAopProxy(AdvisedSupper advisedSupper) {  
+        this.advisedSupper = advisedSupper;  
+    }  
+  
+    /**  
+     * 获取代理对象  
+     *  
+     * @return 代理对象，通过该对象可以调用目标方法以及切面方法  
+     */  
+    @Override  
+    public Object getProxy() {  
+        // 创建 CGLIB 提供的增强器对象（核心代理创建类）  
+        Enhancer enhancer = new Enhancer();  
+  
+        // 设置被代理类的父类（目标对象的真实类）  
+        enhancer.setSuperclass(advisedSupper.getTargetSource().getTarget().getClass());  
+  
+        // 设置代理对象实现的接口（可选）  
+        enhancer.setInterfaces(advisedSupper.getTargetSource().getTargetInterfaceClass());  
+  
+        // 设置方法拦截器，用于处理方法调用  
+        enhancer.setCallback(new DynamicAdvisedInterceptor(advisedSupper));  
+  
+        // 创建并返回代理对象  
+        return enhancer.create();  
+    }  
+  
+  
+  
+    // CglibMethodInvocation 类用于处理 CGLIB 方法调用  
+    private static class CglibMethodInvocation extends ReflectiveMethodInvocation{  
+        private final MethodProxy methodProxy;  
+  
+        /**  
+         * 构造方法，初始化ReflectiveMethodInvocation对象  
+         *  
+         * @param method   方法对象，表示要调用的方法  
+         * @param target   目标对象，即要调用方法的实例  
+         * @param argument 方法参数数组，存储调用方法时传递的参数  
+         */  
+        public CglibMethodInvocation(Method method, Object target, Object[] argument, MethodProxy methodProxy) {  
+            super(method, target, argument);  
+            this.methodProxy = methodProxy;  
+        }  
+  
+        /**  
+         * 执行当前方法调用  
+         *  
+         * @return 方法执行结果  
+         * @throws Throwable 方法执行过程中抛出的异常  
+         */  
+        @Override  
+        public Object proceed() throws Throwable {  
+            // 使用 MethodProxy 执行方法，提高执行效率  
+            return this.methodProxy.invoke(target,argument);  
+        }  
+    }  
+  
+    // DynamicAdvisedInterceptor 类用于适配 CGLIB 的 MethodInterceptor 接口  
+    private static class DynamicAdvisedInterceptor implements MethodInterceptor {  
+        private final AdvisedSupper advisedSupper;  
+  
+        private DynamicAdvisedInterceptor(AdvisedSupper advisedSupper) {  
+            this.advisedSupper = advisedSupper;  
+        }  
+  
+        /**  
+         * 拦截方法调用  
+         *  
+         * @param o        代理对象  
+         * @param method   被调用的方法对象  
+         * @param objects  方法参数数组  
+         * @param methodProxy  方法代理对象，用于调用目标方法  
+         * @return 方法执行结果  
+         * @throws Throwable 方法执行过程中抛出的异常  
+         */  
+        @Override  
+        public Object intercept(Object o, Method method, Object[] objects, MethodProxy methodProxy) throws Throwable {  
+            // 创建 CglibMethodInvocation 对象，封装方法调用信息  
+            CglibMethodInvocation methodInvocation = new CglibMethodInvocation(method, advisedSupper.getTargetSource().getTarget(), objects, methodProxy);  
+  
+            // 如果切点表达式匹配  
+            if (advisedSupper.getMethodMatcher().matches(method,advisedSupper.getTargetSource().getTarget().getClass())){  
+                // 使用切面的 MethodInterceptor 处理方法调用  
+                return advisedSupper.getMethodInterceptor().invoke(methodInvocation);  
+            }  
+            // 如果切点表达式不匹配，则直接调用原始方法  
+            return method.invoke(o,objects);  
+        }  
+    }  
 }
 ```
-- `getMethod()`：获取当前调用的方法（`java.lang.reflect.Method` 对象）。
-- `proceed()`：继续执行拦截器链的下一个拦截器，或者最终调用目标方法。
-- 继承自 `Invocation`，可以获取参数（`getArguments()`）等信息。
-
-
-#### 工作原理
-- 在 Spring AOP 中，当一个方法被代理且匹配切点时，Spring 会构造一个 `MethodInvocation`（通常是 `ReflectiveMethodInvocation`）对象。
-- `ReflectiveMethodInvocation` 内部维护一个拦截器链（`MethodInterceptor` 列表），通过 `proceed()` 方法按顺序执行每个拦截器，最终调用目标方法。
-
-#### 示例
-```java
-ReflectiveMethodInvocation invocation = new ReflectiveMethodInvocation(method, target, args);
-// 在拦截器中调用
-Object result = invocation.proceed(); // 执行下一个拦截器或目标方法
-```
-
-#### 上下文
-- `MethodInvocation` 是 AOP 运行时的核心对象，主要用于**支持拦截器链的执行**。
-- 它不直接处理代理逻辑，而是提供上下文给 `MethodInterceptor` 使用。
-
----
-
-### 1.2，MethodInterceptor
-
-
-#### 作用
-
-`MethodInterceptor` 是一个接口，用于实现方法拦截器，定义在目标方法执行前后插入的切面逻辑（Advice）。它是 Spring AOP 中实现增强（如 `@Before`、`@After`、`@Around`）的核心。
-
-#### 接口定义
-
-```java
-public interface MethodInterceptor extends Interceptor {
-    Object invoke(MethodInvocation invocation) throws Throwable;
-}
-```
-- `invoke` 方法接收一个 `MethodInvocation` 对象，执行拦截逻辑。
-- 拦截器可以：
-  - 调用 `invocation.proceed()` 继续执行下一个拦截器或目标方法。
-  - 不调用 `proceed()`，直接返回自定义结果（绕过目标方法）。
-  - 修改返回值、参数，或处理异常。
-
-#### 工作原理
-
-- Spring AOP 将切面逻辑（如日志、事务）封装为 `MethodInterceptor`。
-- 多个 `MethodInterceptor` 组成一个拦截器链，按顺序执行。
-- 每个拦截器通过 `MethodInvocation` 的 `proceed()` 方法决定是否继续执行。
-
-#### 示例
-
-一个日志拦截器：
-```java
-public class LoggingInterceptor implements MethodInterceptor {
-    @Override
-    public Object invoke(MethodInvocation invocation) throws Throwable {
-        System.out.println("Before: " + invocation.getMethod().getName());
-        Object result = invocation.proceed(); // 执行下一个拦截器或目标方法
-        System.out.println("After: " + invocation.getMethod().getName());
-        return result;
-    }
-}
-```
-
-
-### 1.3，InvocationHandler
-
-
-#### 作用
-`InvocationHandler` 是 Java 动态代理（`java.lang.reflect.Proxy`）的核心接口，用于处理代理对象的逻辑。每次代理对象的方法被调用时，都会委托给 `InvocationHandler` 的 `invoke` 方法。
-
-#### 接口定义
-
-```java
-public interface InvocationHandler {
-    Object invoke(Object proxy, Method method, Object[] args) throws Throwable;
-}
-```
-- `proxy`：代理对象本身。
-- `method`：被调用的方法（`java.lang.reflect.Method` 对象）。
-- `args`：方法调用的参数。
-
-#### 工作原理
-- 使用 `Proxy.newProxyInstance` 创建动态代理时，需要提供一个 `InvocationHandler` 实现。
-- 当代理对象的方法被调用时，JVM 会将调用转发到 `InvocationHandler` 的 `invoke` 方法。
-- `invoke` 方法可以：
-  - 直接调用目标方法（`method.invoke(target, args)`）。
-  - 添加额外的逻辑（如日志、权限检查）。
-  - 修改参数或返回值。
-
-#### 示例
-一个简单的动态代理：
-```java
-public class LoggingInvocationHandler implements InvocationHandler {
-    private final Object target;
-
-    public LoggingInvocationHandler(Object target) {
-        this.target = target;
-    }
-
-    @Override
-    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        System.out.println("Before: " + method.getName());
-        Object result = method.invoke(target, args); // 调用目标方法
-        System.out.println("After: " + method.getName());
-        return result;
-    }
-}
-
-// 使用
-UserService target = new UserService();
-InvocationHandler handler = new LoggingInvocationHandler(target);
-UserService proxy = (UserService) Proxy.newProxyInstance(
-    UserService.class.getClassLoader(),
-    new Class[]{UserService.class},
-    handler
-);
-proxy.getUser("123"); // 会打印 Before 和 After 日志
-```
 
 
 
+
+
+
+
+# 三、AOP 核心术语体系（来自经典 AOP 理论）
+
+| 概念             | 作用                         | 类名/注解               |
+| -------------- | -------------------------- | ------------------- |
+| **Join Point** | 可插入切面的程序点                  | 方法、构造器、字段等          |
+| **Pointcut**   | 匹配 Join Point 的表达式         | `execution(...)` 等  |
+| **Advice**     | 实际执行的“通知”逻辑                | `Before`, `After` 等 |
+| **Aspect**     | 切面（由 Advice + Pointcut 组成） | `@Aspect` 类         |
+| **Weaving**    | 将 Advice 编织到目标类            | 编译期 / 运行期（如代理）      |
+| **Target**     | 被代理的业务对象                   |                     |
+
+所以，“Advice” 不是 Spring 起的，而是 **AOP 理论本身的专业术语**，用来描述：
+
+> **与主业务逻辑相分离的、可复用的横切关注逻辑模块**
+
+## Advice
+
+`Advice` 这个单词的本意是：
+
+> 建议、忠告、指引
+
+在 AOP（面向切面编程）中，它的含义可以理解为：
+
+> 在你执行主业务逻辑之前、之后或异常时，我给你一个‘建议’性的操作，比如加个日志、记录个事务、处理权限等。
+
+所以 Spring、AOP Alliance 采用了这个术语 —— `Advice` 来指代所有横切关注点逻辑的实现。是 AOP 中对“横切关注点代码”的专业称呼，用来表示“你在主业务流程中可以附加的一段建议性逻辑”。
