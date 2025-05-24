@@ -1,4 +1,4 @@
-package org.qlspringframework.beans.ioc.common;
+package org.qlspringframework.beans.common;
 
 import org.qlspringframework.beans.PropertyValue;
 import org.qlspringframework.beans.PropertyValues;

@@ -1,4 +1,4 @@
-package org.qlspringframework.beans.ioc.ioc;
+package org.qlspringframework.beans.ioc;
 
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
@@ -7,8 +7,8 @@ import org.qlspringframework.beans.PropertyValues;
 import org.qlspringframework.beans.factory.config.BeanDefinition;
 import org.qlspringframework.beans.factory.config.BeanReference;
 import org.qlspringframework.beans.factory.supper.DefaultListableBeanFactory;
-import org.qlspringframework.beans.ioc.bean.Car;
-import org.qlspringframework.beans.ioc.bean.People;
+import org.qlspringframework.beans.bean.Car;
+import org.qlspringframework.beans.bean.People;
 
 /**
  * Bean属性值和引用的测试类。

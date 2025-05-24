@@ -1,4 +1,4 @@
-package org.qlspringframework.beans.ioc.ioc;
+package org.qlspringframework.beans.ioc;
 
 import cn.hutool.core.io.IoUtil;
 import org.junit.Test;

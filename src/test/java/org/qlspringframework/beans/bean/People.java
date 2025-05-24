@@ -1,4 +1,4 @@
-package org.qlspringframework.beans.ioc.bean;
+package org.qlspringframework.beans.bean;
 
 import org.qlspringframework.beans.factory.BeanFactory;
 import org.qlspringframework.beans.factory.BeanFactoryAware;
@@ -6,8 +6,6 @@ import org.qlspringframework.beans.factory.DisposableBean;
 import org.qlspringframework.beans.factory.InitializingBean;
 import org.qlspringframework.context.ApplicationContext;
 import org.qlspringframework.context.ApplicationContextAware;
-
-import java.util.HashMap;
 
 /**
  * @author jixu

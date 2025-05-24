@@ -1,4 +1,4 @@
-package org.qlspringframework.beans.ioc.service;
+package org.qlspringframework.beans.service;
 
 /**
  * @author jixu

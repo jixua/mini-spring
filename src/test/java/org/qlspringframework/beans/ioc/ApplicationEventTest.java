@@ -1,7 +1,7 @@
-package org.qlspringframework.beans.ioc.ioc;
+package org.qlspringframework.beans.ioc;
 
 import org.junit.Test;
-import org.qlspringframework.beans.ioc.common.CustomEvent;
+import org.qlspringframework.beans.common.CustomEvent;
 import org.qlspringframework.context.support.ClassPathXmlApplicationContext;
 
 /**

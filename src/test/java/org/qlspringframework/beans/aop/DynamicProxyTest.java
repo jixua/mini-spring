@@ -1,16 +1,20 @@
-package org.qlspringframework.beans.ioc.aop;
+package org.qlspringframework.beans.aop;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.qlspringframework.aop.AdvisedSupper;
 import org.qlspringframework.aop.MethodMatcher;
 import org.qlspringframework.aop.TargetSource;
 import org.qlspringframework.aop.aspectj.AspectJExpressionPointcut;
+import org.qlspringframework.aop.framework.AopProxy;
+import org.qlspringframework.aop.framework.CglibDynamicAopProxy;
 import org.qlspringframework.aop.framework.JdkDynamicAopProxy;
-import org.qlspringframework.aop.framework.ReflectiveMethodInvocation;
-import org.qlspringframework.beans.ioc.common.WorldServiceInterceptor;
-import org.qlspringframework.beans.ioc.service.HelloService;
-import org.qlspringframework.beans.ioc.service.WorldService;
-import org.qlspringframework.beans.ioc.service.WorldServiceImpl;
+import org.qlspringframework.aop.framework.ProxyFactory;
+import org.qlspringframework.aop.framework.adapter.MethodBeforeAdviceInterceptor;
+import org.qlspringframework.beans.common.WorldServiceBeforeAdvice;
+import org.qlspringframework.beans.common.WorldServiceInterceptor;
+import org.qlspringframework.beans.service.WorldService;
+import org.qlspringframework.beans.service.WorldServiceImpl;
 
 /**
  * @author jixu
@@ -19,11 +23,10 @@ import org.qlspringframework.beans.ioc.service.WorldServiceImpl;
  */
 public class DynamicProxyTest {
 
+    public AdvisedSupper advisedSupper = new AdvisedSupper();
 
-    @Test
-    public void testDynamicProxy(){
-
-        AdvisedSupper advisedSupper = new AdvisedSupper();
+    @Before
+    public void setup(){
 
         WorldServiceImpl worldService = new WorldServiceImpl();
         TargetSource targetSource = new TargetSource(worldService);
@@ -32,14 +35,14 @@ public class DynamicProxyTest {
         WorldServiceInterceptor interceptor = new WorldServiceInterceptor();
         advisedSupper.setMethodInterceptor(interceptor);
         // "execution(* org.springframework.test.service.WorldService.explode(..))"
-        AspectJExpressionPointcut pointcut = new AspectJExpressionPointcut("execution(* org.qlspringframework.beans.ioc.service.WorldService.sayHello(..))");
+        AspectJExpressionPointcut pointcut = new AspectJExpressionPointcut("execution(* org.qlspringframework.beans.service.WorldService.sayHello(..))");
         MethodMatcher methodMatcher = pointcut.getMethodMatcher();
         advisedSupper.setMethodMatcher(methodMatcher);
-
-        JdkDynamicAopProxy jdkDynamicAopProxy = new JdkDynamicAopProxy(advisedSupper);
-        WorldService proxy = (WorldService) jdkDynamicAopProxy.getProxy();
-        proxy.sayHello();
-
-
     }
+
+
+
+
+
+
 }

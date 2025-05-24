@@ -1,7 +1,7 @@
-package org.qlspringframework.beans.ioc.common;
+package org.qlspringframework.beans.common;
 
 import org.qlspringframework.beans.factory.FactoryBean;
-import org.qlspringframework.beans.ioc.bean.Car;
+import org.qlspringframework.beans.bean.Car;
 
 /**
  * @author jixu

@@ -1,4 +1,4 @@
-package org.qlspringframework.beans.ioc.ioc;
+package org.qlspringframework.beans.ioc;
 
 import org.junit.Test;
 import org.qlspringframework.context.support.ClassPathXmlApplicationContext;

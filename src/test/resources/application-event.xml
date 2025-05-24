@@ -7,9 +7,9 @@
 		 http://www.springframework.org/schema/context
 		 http://www.springframework.org/schema/context/spring-context-4.0.xsd">
 
-    <bean class="org.qlspringframework.beans.ioc.common.ContextRefreshEventListener"/>
-    <bean class="org.qlspringframework.beans.ioc.common.ContextCloseEventListener"/>
-    <bean class="org.qlspringframework.beans.ioc.common.CustomEventListener"/>
+    <bean class="org.qlspringframework.beans.common.ContextRefreshEventListener"/>
+    <bean class="org.qlspringframework.beans.common.ContextCloseEventListener"/>
+    <bean class="org.qlspringframework.beans.common.CustomEventListener"/>
 
 
 

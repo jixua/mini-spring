@@ -1,7 +1,7 @@
-package org.qlspringframework.beans.ioc.common;
+package org.qlspringframework.beans.common;
 
 import org.qlspringframework.beans.factory.config.BeanPostProcessor;
-import org.qlspringframework.beans.ioc.bean.People;
+import org.qlspringframework.beans.bean.People;
 
 /**
  * @description:

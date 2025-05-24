@@ -1,9 +1,9 @@
-package org.qlspringframework.beans.ioc.ioc;
+package org.qlspringframework.beans.ioc;
 
 import org.junit.Test;
 import org.qlspringframework.beans.factory.supper.DefaultListableBeanFactory;
 import org.qlspringframework.beans.factory.xml.XmlBeanDefinitionReader;
-import org.qlspringframework.beans.ioc.bean.People;
+import org.qlspringframework.beans.bean.People;
 
 /**
  * @description:

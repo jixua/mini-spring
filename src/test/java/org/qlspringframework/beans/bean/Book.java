@@ -1,4 +1,4 @@
-package org.qlspringframework.beans.ioc.bean;
+package org.qlspringframework.beans.bean;
 
 import org.qlspringframework.beans.factory.BeanFactory;
 import org.qlspringframework.beans.factory.BeanFactoryAware;

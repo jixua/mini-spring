@@ -1,9 +1,9 @@
-package org.qlspringframework.beans.ioc.aop;
+package org.qlspringframework.beans.aop;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.qlspringframework.aop.aspectj.AspectJExpressionPointcut;
-import org.qlspringframework.beans.ioc.service.HelloService;
+import org.qlspringframework.beans.service.HelloService;
 
 import java.lang.reflect.Method;
 

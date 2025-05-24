@@ -1,9 +1,9 @@
-package org.qlspringframework.beans.ioc.ioc;
+package org.qlspringframework.beans.ioc;
 
 import org.junit.Test;
 import org.qlspringframework.beans.factory.config.BeanDefinition;
 import org.qlspringframework.beans.factory.supper.DefaultListableBeanFactory;
-import org.qlspringframework.beans.ioc.service.HelloService;
+import org.qlspringframework.beans.service.HelloService;
 
 /**
  * @author jixu

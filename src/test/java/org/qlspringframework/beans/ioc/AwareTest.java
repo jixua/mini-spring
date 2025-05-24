@@ -1,8 +1,8 @@
-package org.qlspringframework.beans.ioc.ioc;
+package org.qlspringframework.beans.ioc;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.qlspringframework.beans.ioc.bean.People;
+import org.qlspringframework.beans.bean.People;
 import org.qlspringframework.context.support.ClassPathXmlApplicationContext;
 
 /**
