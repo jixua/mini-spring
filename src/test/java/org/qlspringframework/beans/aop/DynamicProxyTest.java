@@ -70,6 +70,16 @@ public class DynamicProxyTest {
     }
 
 
+    @Test
+    public void testBeforeAdvice(){
+        WorldServiceBeforeAdvice advice = new WorldServiceBeforeAdvice();
+        MethodBeforeAdviceInterceptor methodInterceptor = new MethodBeforeAdviceInterceptor(advice);
+        advisedSupper.setMethodInterceptor(methodInterceptor);
+
+        CglibDynamicAopProxy cglibDynamicAopProxy = new CglibDynamicAopProxy(advisedSupper);
+        WorldService proxy = (WorldService) cglibDynamicAopProxy.getProxy();
+        proxy.sayHello();
+    }
 
 
 
