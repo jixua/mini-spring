@@ -60,5 +60,17 @@ public class DynamicProxyTest {
 
     }
 
+    @Test
+    public void testProxyFactory(){
+        advisedSupper.setProxyTargetClass(true);
+        ProxyFactory proxyFactory = new ProxyFactory(advisedSupper);
+        WorldService worldService = (WorldService) proxyFactory.getProxy();
+        worldService.sayHello();
+
+    }
+
+
+
+
 
 }
