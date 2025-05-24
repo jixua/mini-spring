@@ -41,8 +41,24 @@ public class DynamicProxyTest {
     }
 
 
+    @Test
+    public void testJdkDynamicProxy(){
+        JdkDynamicAopProxy jdkDynamicAopProxy = new JdkDynamicAopProxy(advisedSupper);
+        WorldService proxy = (WorldService) jdkDynamicAopProxy.getProxy();
+        proxy.sayHello();
 
 
+    }
+
+
+    @Test
+    public void testCglibDynamicProxy(){
+        // 创建Cglib代理对象
+        CglibDynamicAopProxy cglibDynamicAopProxy = new CglibDynamicAopProxy(advisedSupper);
+        WorldService proxy = (WorldService) cglibDynamicAopProxy.getProxy();
+        proxy.sayHello();
+
+    }
 
 
 }

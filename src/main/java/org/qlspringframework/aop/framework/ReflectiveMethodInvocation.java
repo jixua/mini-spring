@@ -16,13 +16,13 @@ import java.lang.reflect.Method;
 public class ReflectiveMethodInvocation implements MethodInvocation {
 
     // 方法对象，表示要调用的方法
-    private final Method method;
+    protected final Method method;
 
     // 目标对象，即要调用方法的实例
-    private final Object target;
+    protected final Object target;
 
     // 方法参数数组，存储调用方法时传递的参数
-    private final Object[] argument;
+    protected final Object[] argument;
 
     /**
      * 构造方法，初始化ReflectiveMethodInvocation对象

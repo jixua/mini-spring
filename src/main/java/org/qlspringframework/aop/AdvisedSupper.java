@@ -1,6 +1,7 @@
 package org.qlspringframework.aop;
 
 import org.aopalliance.intercept.MethodInterceptor;
+import sun.dc.pr.PRError;
 
 /**
  * AdvisedSupper类是用于配置和管理目标源、方法匹配器和方法拦截器的超级类
@@ -20,6 +21,11 @@ public class AdvisedSupper {
 
     // 方法拦截器，用于在满足条件时对方法进行实际的拦截和处理
     private MethodInterceptor methodInterceptor;
+
+    // 是否开启Cglib代理
+    private boolean proxyTargetClass = false;
+
+
 
     /**
      * 获取方法匹配器
@@ -73,6 +79,14 @@ public class AdvisedSupper {
      */
     public void setMethodInterceptor(MethodInterceptor methodInterceptor) {
         this.methodInterceptor = methodInterceptor;
+    }
+
+    public boolean isProxyTargetClass() {
+        return proxyTargetClass;
+    }
+
+    public void setProxyTargetClass(boolean proxyTargetClass) {
+        this.proxyTargetClass = proxyTargetClass;
     }
 }
 
