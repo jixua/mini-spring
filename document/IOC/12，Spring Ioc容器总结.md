@@ -19,8 +19,8 @@
 
 以上部分由BeanFactory完成，属于初始化单例Bean的子步骤
 
-![[../assets/Pasted image 20250513211808.png]]
-![[../assets/Pasted image 20250513212144.png]]
+![[../../assets/Pasted image 20250513211808.png]]
+![[../../assets/Pasted image 20250513212144.png]]
 
 
 这里先来聊一下什么是Spring的IOC容器吧
@@ -44,7 +44,7 @@ public void testXmlResourceReader(){
 接下来我们就从架构设计的角度来聊一聊IOC的实现
 
 首先来看一下完整的类图
-![[../assets/Pasted image 20250516204019.png]]
+![[../../assets/Pasted image 20250516204019.png]]
 
 对于Spring的架构设计是极其复杂的，上述也是只包含了BeanFactory的相关实现，我们可以看到`DefaultListableBeanFactory`是BeanFactory的核心类，那么除此之外的话，Spring对单一职责的设计也做到了极致，BeanFactory的每一个子接口实际上都对应着不同的功能。
 

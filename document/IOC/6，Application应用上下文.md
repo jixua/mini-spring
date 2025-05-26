@@ -281,7 +281,7 @@ beanFactory.preInstantiateSingletons();
 
 可参考 https://gitee.com/jixuonline/jixu-mini-spring.git
 
-![](../assets/Pasted%20image%2020250429101356.png)
+![](../../assets/Pasted%20image%2020250429101356.png)
 
 
 `ApplicationContext`

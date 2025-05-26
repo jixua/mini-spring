@@ -385,7 +385,7 @@ public void testBeanPostPostProcess() {
 
 我们来看一下是如何抽取的，通俗的说我们又抽取了ListableBeanFactory这个分支用来处理BeanFactoryPostProcess也就是对BeanDefinition操作的相关逻辑。
 
-![](../assets/Pasted%20image%2020250415170054.png)
+![](../../assets/Pasted%20image%2020250415170054.png)
 
 ```java
 public interface ListableBeanFactory extends BeanFactory {  

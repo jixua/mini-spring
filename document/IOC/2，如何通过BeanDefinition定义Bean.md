@@ -219,7 +219,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
 从这张图就可以看出所有的继承关系了，我们也可以发现 DefaultListableBeanFactory 同时包含了 SingletonBeanRegister 与 BeanDefinitionRegistry 的所有功能，也是容器的核心类
 
-![](../assets/Pasted%20image%2020250415165939.png)
+![](../../assets/Pasted%20image%2020250415165939.png)
 
 
 ## 五，如何在Bean中注入Bean

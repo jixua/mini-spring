@@ -241,4 +241,4 @@ public class InitAndDestroyMethodTest {
 
 ## 三，当前Bean的生命周期
 
-![[../assets/Pasted image 20250504165747.png]]
+![[../../assets/Pasted image 20250504165747.png]]

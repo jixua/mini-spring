@@ -1,7 +1,7 @@
 在上一篇当中我们完成了对三种资源文件的读写
 
 
-![](../assets/Pasted%20image%2020250415170019.png)
+![](../../assets/Pasted%20image%2020250415170019.png)
 
 
 ```java
