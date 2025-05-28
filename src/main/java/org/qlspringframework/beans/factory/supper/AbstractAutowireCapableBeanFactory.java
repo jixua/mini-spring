@@ -187,7 +187,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
                 // 如果是Bean引用，则获取对应的Bean实例
                 if (value instanceof BeanReference){
-                    value = super.getBean(name);
+                    BeanReference beanReference = (BeanReference) value;
+                    value = super.getBean(beanReference.getBeanName());
                 }
 
                 // 通过属性的set方法设置属性
