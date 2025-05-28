@@ -14,6 +14,9 @@ import org.qlspringframework.aop.MethodBeforeAdvice;
  */
 public class MethodBeforeAdviceInterceptor implements MethodInterceptor {
 
+    public MethodBeforeAdviceInterceptor() {
+    }
+
     // 前置通知对象，定义了在目标方法调用前需要执行的逻辑
     private MethodBeforeAdvice advice;
 
@@ -40,6 +43,10 @@ public class MethodBeforeAdviceInterceptor implements MethodInterceptor {
         advice.before(methodInvocation.getMethod(), methodInvocation.getArguments(), methodInvocation.getThis());
         // 继续执行下一个拦截器或目标方法本身
         return methodInvocation.proceed();
+    }
+
+    public void setAdvice(MethodBeforeAdvice advice) {
+        this.advice = advice;
     }
 }
 
