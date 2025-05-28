@@ -27,14 +27,17 @@ public class DynamicProxyTest {
 
     @Before
     public void setup(){
-
+        // 被代理对象
         WorldServiceImpl worldService = new WorldServiceImpl();
+        // 封装为目标资源对象
         TargetSource targetSource = new TargetSource(worldService);
         advisedSupper.setTargetSource(targetSource);
 
+        // 创建拦截器对象
         WorldServiceInterceptor interceptor = new WorldServiceInterceptor();
         advisedSupper.setMethodInterceptor(interceptor);
-        // "execution(* org.springframework.test.service.WorldService.explode(..))"
+
+        // 创建PointCut解析器
         AspectJExpressionPointcut pointcut = new AspectJExpressionPointcut("execution(* org.qlspringframework.beans.service.WorldService.sayHello(..))");
         MethodMatcher methodMatcher = pointcut.getMethodMatcher();
         advisedSupper.setMethodMatcher(methodMatcher);
