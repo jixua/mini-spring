@@ -1,79 +1,50 @@
 # Mini-Spring Framework
 
+
 ## 项目简介
-Mini-Spring 是一个简化版的 Spring 框架实现，旨在帮助开发者更好地理解 Spring 框架的核心原理和实现机制。该项目保留了 Spring 的核心功能，同时去除了复杂的细节，使得代码更加清晰易懂。
 
-## 主要特性
-- 基于 Java 8 开发
-- 实现 IoC（控制反转）容器
-- 支持依赖注入（DI）
-- 包含基础的 AOP（面向切面编程）功能
-- 简化的 Bean 生命周期管理
+Mini-Spring  是一个简化版的 Spring 框架，抽取并还原了 Spring 的核心设计理念，保留 IoC 容器、AOP、资源加载器、事件监听器、类型转换、容器扩展点、Bean 生命周期与作用域、应用上下文等核心功能，帮助深入理解框架底层原理。
 
-## 环境要求
-- JDK 8 或更高版本
-- Maven 3.6.x 或更高版本
-- IDE 推荐：IntelliJ IDEA
+---
 
-## 技术栈
-- 核心框架：自研 Mini-Spring 框架
-- 构建工具：Maven
-- 测试框架：JUnit 4.11
-- 断言库：AssertJ 3.11.1
-- 工具库：Hutool 5.5.0
+## IOC
 
-## 快速开始
-1. 克隆项目到本地
-```bash
-git clone https://gitee.com/jixuonline/jixu-mini-spring.git
-```
+- [1，如何实现一个简单的IOC容器](document/IOC/1，如何实现一个简单的IOC容器.md)
+- [2，如何通过BeanDefinition定义Bean](document/IOC/2，如何通过BeanDefinition定义Bean.md)
+- [3，如何实现资源文件的加载](document/IOC/3，如何实现资源文件的加载.md)
+- [4，如何通过XML注册Bean](document/IOC/4，如何通过XML注册Bean.md)
+- [5，PostProcess容器扩展机制](document/IOC/5，PostProcess容器扩展机制.md)
+- [6，Application应用上下文](document/IOC/6，Application应用上下文.md)
+- [7，Bean的初始化和销毁](document/IOC/7，Bean的初始化和销毁.md)
+- [8，Aware接口](document/IOC/8，Aware接口.md)
+- [9，实现scope作用域支持](document/IOC/9，实现scope作用域支持.md)
+- [10，FactoryBean](document/IOC/10，FactoryBean.md)
+- [11，ApplicationEvent事件监听器](document/IOC/9，实现scope作用域支持.md)
+- [12，SpringIOC容器总结](document/IOC/12，SpringIOC容器总结.md)
 
-2. 使用 Maven 安装依赖
-```bash
-mvn clean install
-```
+## AOP
 
-3. 在 IDE 中导入项目
-- 选择 "Import Project"
-- 选择项目根目录
-- 选择 Maven 项目类型
-- 等待依赖下载完成
+- [1，PointCut切入点](document/AOP/1，PointCut切入点.md)
+- [2，AOP动态代理](document/AOP/2，AOP动态代理.md)
+- [3，ProxyFactory代理工厂](document/AOP/3，ProxyFactory代理工厂.md)
 
-## 项目结构
-```
-src
-├── main/java
-│   └── org
-│       └── qlspringframework
-│           ├── beans        # Bean 相关实现
-│           │   ├── factory  # Bean 工厂实现
-│           │   └── support  # Bean 支持类
-│           └── core        # 核心功能实现
-└── test/java
-    └── org
-        └── qlspringframework
-            └── beans        # Bean 相关测试
-                └── factory  # Bean 工厂测试
-```
 
-## 使用示例
-```java
-// TODO: 添加具体的使用示例代码
-```
+---
 
 ## 开发计划
-- [ ] 完善 IoC 容器
-- [ ] 增强 AOP 功能
-- [ ] 添加更多单元测试
+
+- [x] 完善 IoC 容器，Bean生命周期管理
+- [x] 实现事件机制
+- [x] 实现容器扩展点
+- [ ] 构建 AOP 框架
 - [ ] 支持注解配置
-- [ ] 实现简单的 MVC 功能
+- [ ] 类型转换
+- [ ] 循环依赖
 
-## 参与贡献
-1. Fork 本仓库
-2. 创建新的特性分支 (`git checkout -b feature/AmazingFeature`)
-3. 提交你的更改 (`git commit -m 'Add some AmazingFeature'`)
-4. 推送到分支 (`git push origin feature/AmazingFeature`)
-5. 开启一个 Pull Request
 
-## 开源协议
-该项目使用 MIT 协议 - 查看 [LICENSE](LICENSE) 文件了解详情 
+---
+
+## 参考
+
+- [《mini-spring》](https://github.com/DerekYRC/mini-spring)
+- [《Spring源码深度解析》](https://book.douban.com/subject/25866350/)
