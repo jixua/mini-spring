@@ -1,0 +1,341 @@
+
+## 一，AOP 自动代理的实现机制
+
+在手写 AOP 框架或者理解 Spring AOP 的底层实现时，一个关键问题是：**代理对象是如何在 Spring 生命周期中被创建的？**
+
+AOP 的“自动代理”本质上是将代理对象的创建融入到 Spring 的 Bean 生命周期中。在 `createBean` 的流程中，Spring 会判断当前 Bean 是否需要被增强（即是否是一个代理对象），如果是，就会绕过原始 Bean 的常规实例化流程，直接返回一个代理对象。
+
+### 如何判断某个 Bean 是否需要被代理？
+
+前面我们已经将切点（Pointcut）和通知（Advice）封装成了一个个完整的 **Advisor** 对象。每个 Advisor 内部都包含了一个 Pointcut，而我们可以通过 Pointcut 的 `matches` 方法来判断某个类是否匹配某个增强逻辑。
+
+也就是说，在 Bean 创建过程中，框架可以遍历已有的 Advisor，通过匹配机制识别哪些类是“待增强对象”，并据此决定是否创建代理。
+
+### 代理对象在哪个生命周期节点创建？
+
+这是自动代理实现的关键：是在 `postProcessBeforeInitialization` 还是 `postProcessAfterInitialization` 中创建代理？
+
+- `postProcessBeforeInitialization`：此时 Bean 已被实例化，但还未完成依赖注入。如果此时直接返回代理对象，将**中断后续的注入与初始化流程**。因此，一般不在此阶段生成代理。
+
+- `postProcessAfterInitialization`：这是最常见的切入点。Bean 已完成实例化、属性注入与初始化，此时创建代理对象并返回，**不会影响原有的生命周期流程**。
+
+
+当然，Spring 并非绝对依赖后置增强。例如，对于某些自定义的 `TargetSource`（例如热部署场景中），Spring 允许用户在前置处理阶段就接管整个 Bean 的创建与生命周期管理。
+。
+
+
+
+## 二，底层实现逻辑
+
+### 1，自动代理的实现
+
+我们当前实现的是基础的 AOP 自动代理机制，尚未处理代理的循环依赖与代理链问题，这部分将在后续章节中进一步探讨。 相关代码可参考项目的 Git 提交记录。
+
+#### 实例化AwareBeanPostProcessor
+
+定义用于 Bean 实例化前处理的接口，用于实现自动代理逻辑的扩展点。
+
+定义用于初始化的`InstantiationAwareBeanPostProcessor`接口，实现BeanPostProcessor，用于后续的代理增强逻辑等
+
+```java
+public interface InstantiationAwareBeanPostProcessor extends BeanPostProcessor{  
+
+  
+    Object postProcessBeforeInstantiation(Class<?> beanClass , String beanName);  
+  
+  
+}
+```
+
+#### SmartInstantiationAwareBeanPostProcessor
+
+用于支持更复杂的场景（如循环依赖的代理处理），当前版本暂未使用，后续会补充。
+
+```java
+public interface SmartInstantiationAwareBeanPostProcessor extends InstantiationAwareBeanPostProcessor{  
+}
+```
+
+这些接口是为了更好地与 Spring 的架构体系对接。 目前只需关注核心实现类 。`AbstractAdvisorAutoProxyCreator`
+
+#### 抽象自动代理创建者
+
+`AbstractAutoProxyCreator` 是自动代理的抽象基类，实现了 和 接口。 其职责是为目标 Bean 提供统一的自动代理创建逻辑，封装了创建代理对象的基础流程。`SmartInstantiationAwareBeanPostProcessor``BeanFactoryAware`
+
+```java
+/**  
+ * 抽象自动代理创建器类  
+ * 该类实现了SmartInstantiationAwareBeanPostProcessor和BeanFactoryAware接口，  
+ * 用于自动创建代理 bean，其主要作用是简化AOP（面向切面编程）的配置和使用  
+ *  
+ * @author jixu 
+ * @title AbstractAutoProxyCreator 
+ * @date 2025/5/29 00:44 
+ */
+public abstract class AbstractAutoProxyCreator implements SmartInstantiationAwareBeanPostProcessor, BeanFactoryAware {  
+  
+}
+```
+
+#### 抽象顾问自动代理创建器
+
+
+这是自动代理的核心类，实现了创建代理对象的完整流程：
+
+- 它在 中调用 方法，决定是否为某个 Bean 创建代理。`postProcessAfterInitialization``wrapIfNecessary`
+
+- 代理判断依据为：是否匹配某个切面（通过 判断）。`AspectJExpressionPointcutAdvisor`
+
+关键方法如下：
+
+```java
+@Override
+public Object postProcessAfterInitialization(Object bean, String beanName) {
+    return wrapIfNecessary(bean, beanName);
+}
+
+```
+
+##### wrapIfNecessary：判断是否创建代理并包装
+
+该方法核心逻辑：
+
+1. 跳过基础设施类（如 Advisor、Pointcut 等）
+
+2. 获取所有 Advisor
+
+3. 遍历判断当前 Bean 是否匹配某切点
+
+4. 若匹配，使用 创建代理对象并返回`ProxyFactory`
+
+
+
+```java
+/**  
+ * 抽象的顾问自动代理创建者类  
+ * 该类的作用是自动创建代理对象，根据特定的规则或条件，动态地应用顾问（Advisor）到目标对象上  
+ * 主要用于Spring框架的AOP（面向切面编程）功能中，以实现自动代理机制  
+ *  
+ * @author jixu 
+ * @title AbstractAdvisorAutoProxyCreator 
+ * @date 2025/5/29 00:44 
+ */
+public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyCreator{  
+  
+    // 定义一个 BeanFactory 属性，用于管理 Bean 的创建和生命周期。  
+    private DefaultListableBeanFactory beanFactory;  
+  
+    /**  
+     * 设置 BeanFactory。  
+     * 当本类需要访问或操作 Spring 容器中的 Bean 时，通过此方法注入 BeanFactory。  
+     *  
+     * @param beanFactory Spring 容器的 BeanFactory。  
+     */  
+    @Override  
+    public void setBeanFactory(BeanFactory beanFactory) {  
+        this.beanFactory = (DefaultListableBeanFactory) beanFactory;  
+    }  
+  
+    /**  
+     * 在 Bean 实例化之前进行后处理。  
+     * 用于创建自定义 TargetSource代理对象  
+     * 跳过默认生命周期：直接返回代理对象后，Spring 会跳过该 Bean 的默认实例化、依赖注入和初始化流程，由代理完全控制目标对象的行为。  
+     *  
+     * @param beanClass Bean 的类。  
+     * @param beanName  Bean 的名称。  
+     * @return 返回代理对象，如果没有代理则返回 null。  
+     */  
+    @Override  
+    public Object postProcessBeforeInstantiation(Class<?> beanClass, String beanName) {  
+  
+        return null;  
+    }  
+  
+    /**  
+     * 判断指定的类是否是基础设施类。  
+     * 基础设施类包括 Advice、Pointcut 和 Advisor 类，这些类用于 AOP 的配置和实现。  
+     *  
+     * @param beanClass 要判断的类。  
+     * @return 如果是基础设施类则返回 true，否则返回 false。  
+     */  
+    private boolean isInfrastructureClass(Class<?> beanClass) {  
+  
+        return Advice.class.isAssignableFrom(beanClass)  
+                || PointCut.class.isAssignableFrom(beanClass)  
+                || Advisor.class.isAssignableFrom(beanClass);  
+    }  
+  
+    /**  
+     * 在 Bean 初始化之前执行自定义处理逻辑。  
+     * 使用此方法，可以在 Bean 被初始化之前对其进行修改或执行其他操作。  
+     *  
+     * @param bean     当前正在初始化的 Bean 实例。  
+     * @param beanName 当前 Bean 的名称。  
+     * @return 返回处理后的 Bean 实例，可以是原始 Bean 或修改后的 Bean。  
+     */  
+    @Override  
+    public Object postProcessBeforeInitialization(Object bean, String beanName) {  
+        return bean;  
+    }  
+  
+    /**  
+     * 在 Bean 初始化之后执行自定义处理逻辑。  
+     * 使用此方法，可以在 Bean 初始化完成后对其进行进一步的修改或执行其他操作。  
+     *  
+     * @param bean     当前已经初始化的 Bean 实例。  
+     * @param beanName 当前 Bean 的名称。  
+     * @return 返回处理后的 Bean 实例，可以是原始 Bean 或修改后的 Bean。  
+     */  
+    @Override  
+    public Object postProcessAfterInitialization(Object bean, String beanName) {  
+  
+        return wrapIfNecessary(bean, beanName);  
+  
+    }  
+  
+    /**  
+     * 根据需要包装 Bean。  
+     * 如果 Bean 需要被代理，则创建并返回代理对象；否则返回原始 Bean。  
+     *  
+     * @param bean     当前 Bean 实例。  
+     * @param beanName 当前 Bean 的名称。  
+     * @return 返回可能被包装过的 Bean 实例。  
+     */  
+    protected Object wrapIfNecessary(Object bean, String beanName){  
+  
+        Class<?> beanClass = bean.getClass();  
+        // 避免代理AOP相关配置类  
+        if (isInfrastructureClass(beanClass)) {  
+            return null;  
+        }  
+  
+        // 获取到所有的Advisor  
+        Collection<AspectJExpressionPointcutAdvisor> advisors = beanFactory.getBeanOfType(AspectJExpressionPointcutAdvisor.class).values();  
+        try {  
+            for (AspectJExpressionPointcutAdvisor advisor : advisors) {  
+                // 如果要代理的是当前类  
+                if (advisor.getPointcut().getClassFilter().matches(beanClass)) {  
+                    AdvisedSupper advisedSupper = new AdvisedSupper();  
+  
+                    BeanDefinition beanDefinition = beanFactory.getBeanDefinition(beanName);  
+                    Object beanInstantiate = beanFactory.getInstantiationStrategy().instantiate(beanDefinition);  
+                    TargetSource targetSource = new TargetSource(beanInstantiate);  
+  
+                    advisedSupper.setMethodInterceptor(((MethodInterceptor) advisor.getAdvice()));  
+                    advisedSupper.setTargetSource(targetSource);  
+                    advisedSupper.setMethodMatcher(advisor.getPointcut().getMethodMatcher());  
+  
+                    Object proxy = new ProxyFactory(advisedSupper).getProxy();  
+                    return proxy;  
+  
+                }  
+            }  
+        } catch (Exception e) {  
+            throw new BeansException("代理对象："+beanName+"创建失败", e);  
+        }  
+  
+        return bean;  
+    }  
+}
+```
+
+#### 默认顾问自动代理创建者
+
+该类作为最终对外暴露的默认实现，继承自 ，无新增逻辑，仅作为注册入口。`AbstractAdvisorAutoProxyCreator`
+
+```java
+/**  
+ * DefaultAdvisorAutoProxyCreator类的作用是自动创建代理Bean，该类主要负责根据Advisor来创建代理Bean，  
+ * 并将这些Bean自动应用到应用程序上下文中。它实现了BeanPostProcessor接口，以便在Bean创建前后进行处理，  
+ * 并使用AopProxyFactory来创建代理对象。该类还支持通过设置暴露代理属性来控制是否将代理Bean暴露给其他Bean使用。  
+ *  
+ * @author jixu 
+ * @title DefaultAdvisorAutoProxyCreator 
+ * @date 2025/5/28 15:48 
+ */
+ public class DefaultAdvisorAutoProxyCreator extends AbstractAdvisorAutoProxyCreator  {  
+  
+  
+}
+```
+
+### 2，融入BeanFactory
+
+#AbstractAutowireCapableBeanFactory
+
+为了使自动代理能够生效，我们需要在 Bean 实例化流程中注入代理创建逻辑。
+
+#### AbstractAutowireCapableBeanFactory 增强
+
+重写 方法，在实例化前调用自动代理扩展点：`createBean`
+
+```java
+@Override  
+protected Object createBean(String beanName, BeanDefinition beanDefinition) {  
+	try {  
+	    // 给 BeanPostProcessors 一个返回代理而不是目标 bean 实例的机会。  
+	    Object bean = resolveBeforeInstantiation(beanName, beanDefinition);  
+	    if (bean != null) {  
+	        return bean;  
+	    }  
+	} catch (Throwable ex) {  
+	    throw new BeansException("BeanPostProcessor before instantiation of bean failed", ex);  
+	}
+  
+    return doCreateBean(beanName , beanDefinition);  
+}
+
+```
+
+resolveBeforeInstantiation：提前触发代理创建
+
+```java
+/**  
+ * 在实例化之前解析Bean  
+ * 如果Bean是代理对象，提前执行beanPostProcessor逻辑  
+ *  
+ * @param beanName Bean名称  
+ * @param beanDefinition Bean的定义信息  
+ * @return 如果是代理对象，则返回处理后的Bean实例，否则返回null  
+ */
+protected Object resolveBeforeInstantiation(String beanName, BeanDefinition beanDefinition) {  
+    // 判断当前Bean是否为代理对象，提前执行beanPostProcessor逻辑  
+    Object bean = applyBeanPostProcessorsBeforeInstantiation(beanDefinition.getBeanClass(), beanName);  
+    if (bean != null){  
+        bean = applyBeanPostProcessorsAfterInitialization(bean,beanName);  
+    }  
+    return bean;  
+}
+
+
+```
+
+applyBeanPostProcessorsBeforeInstantiation：触发前置处理
+
+```java
+/**  
+ * 在实例化之前应用BeanPostProcessor  
+ * * @param beanClass Bean的类  
+ * @param beanName Bean的名称  
+ * @return 如果Bean是代理对象，则返回处理后的Bean实例，否则返回null  
+ */
+ private Object applyBeanPostProcessorsBeforeInstantiation(Class beanClass, String beanName) {  
+    // 获取到所有的BeanPostProcess  
+    List<BeanPostProcessor> beanPostProcessors = getBeanPostProcessors();  
+  
+    // 筛选出InstantiationAwareBeanPostProcessor类型的beanPostProcessor  
+    for (BeanPostProcessor beanPostProcessor : beanPostProcessors) {  
+        if (beanPostProcessor instanceof InstantiationAwareBeanPostProcessor){  
+  
+            // 如果前置增强执行成功返回到的Bean非空则说明该Bean是被代理Bean  
+            Object bean = ((InstantiationAwareBeanPostProcessor) beanPostProcessor).postProcessBeforeInstantiation(beanClass, beanName);  
+            if (bean != null){  
+                return bean;  
+            }  
+  
+        }  
+    }  
+  
+    return null;  
+}
+```
