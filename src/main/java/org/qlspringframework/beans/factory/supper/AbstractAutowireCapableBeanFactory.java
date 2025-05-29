@@ -11,7 +11,6 @@ import org.qlspringframework.beans.factory.config.*;
 
 import java.lang.reflect.Method;
 import java.util.List;
-
 /**
  * 抽象的自动装配功能的Bean工厂类
  * 实现了Bean的创建、依赖注入、初始化以及BeanPostProcessor的处理等功能
@@ -34,15 +33,29 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
      */
     @Override
     protected Object createBean(String beanName, BeanDefinition beanDefinition) {
-        // 判断是否为代理Bean
-        Object bean = resolveBeforeInstantiation(beanName,beanDefinition);
-        if (bean != null){
-            return bean;
+
+        try {
+            // 给 BeanPostProcessors 一个返回代理而不是目标 bean 实例的机会。
+            Object bean = resolveBeforeInstantiation(beanName, beanDefinition);
+            if (bean != null) {
+                return bean;
+            }
+        } catch (Throwable ex) {
+            throw new BeansException("BeanPostProcessor before instantiation of bean failed", ex);
         }
+
 
         return doCreateBean(beanName , beanDefinition);
     }
 
+    /**
+     * 在实例化之前解析Bean
+     * 如果Bean是代理对象，提前执行beanPostProcessor逻辑
+     *
+     * @param beanName Bean名称
+     * @param beanDefinition Bean的定义信息
+     * @return 如果是代理对象，则返回处理后的Bean实例，否则返回null
+     */
     protected Object resolveBeforeInstantiation(String beanName, BeanDefinition beanDefinition) {
         // 判断当前Bean是否为代理对象，提前执行beanPostProcessor逻辑
         Object bean = applyBeanPostProcessorsBeforeInstantiation(beanDefinition.getBeanClass(), beanName);
@@ -51,8 +64,6 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         }
         return bean;
     }
-
-
 
     /**
      * 执行具体创建Bean的逻辑
@@ -66,6 +77,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
             // 通过InstantiationStrategy实例化Bean
             bean = createBeanInstance(beanDefinition);
 
+
+
             // 为Bean的属性进行赋值
             applyPropertyValues(bean , beanDefinition , beanName);
 
@@ -77,7 +90,6 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         // 注册带有销毁方法的Bean
         registerDisposableBeanIfNecessary(beanName, bean, beanDefinition);
 
-
         // 创建完毕后加入缓存
         if (beanDefinition.isSingleton()){
             super.addSingletonBean(beanName, bean);
@@ -85,13 +97,19 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         return bean;
     }
 
+    /**
+     * 如果需要，注册可销毁的Bean
+     *
+     * @param beanName Bean名称
+     * @param bean Bean实例
+     * @param beanDefinition Bean的定义信息
+     */
     private void registerDisposableBeanIfNecessary(String beanName, Object bean, BeanDefinition beanDefinition) {
         if (beanDefinition.isSingleton()){
             if (bean instanceof DisposableBean || StrUtil.isNotEmpty(beanDefinition.getDestroyMethodName())){
                 super.registerDisposableBean(beanName,new DisposableBeanAdapter(bean,beanName, beanDefinition.getDestroyMethodName()));
             }
         }
-
     }
 
     /**
@@ -123,6 +141,14 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         return wrappedBean;
     }
 
+    /**
+     * 调用初始化方法
+     *
+     * @param beanName Bean名称
+     * @param bean Bean实例
+     * @param beanDefinition Bean的定义信息
+     * @throws Exception 如果初始化方法调用失败
+     */
     private void invokeInitMethods(String beanName, Object bean, BeanDefinition beanDefinition) throws Exception{
         if (bean instanceof InitializingBean){
             ((InitializingBean) bean).afterPropertiesSet();
@@ -197,15 +223,21 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         this.instantiationStrategy = instantiationStrategy;
     }
 
-
+    /**
+     * 在实例化之前应用BeanPostProcessor
+     *
+     * @param beanClass Bean的类
+     * @param beanName Bean的名称
+     * @return 如果Bean是代理对象，则返回处理后的Bean实例，否则返回null
+     */
     private Object applyBeanPostProcessorsBeforeInstantiation(Class beanClass, String beanName) {
         // 获取到所有的BeanPostProcess
         List<BeanPostProcessor> beanPostProcessors = getBeanPostProcessors();
 
         // 筛选出InstantiationAwareBeanPostProcessor类型的beanPostProcessor
         for (BeanPostProcessor beanPostProcessor : beanPostProcessors) {
-            if (beanPostProcessor instanceof InstantiationAwareBeanPostProcessor){
 
+            if (beanPostProcessor instanceof InstantiationAwareBeanPostProcessor){
                 // 如果前置增强执行成功返回到的Bean非空则说明该Bean是被代理Bean
                 Object bean = ((InstantiationAwareBeanPostProcessor) beanPostProcessor).postProcessBeforeInstantiation(beanClass, beanName);
                 if (bean != null){
@@ -216,7 +248,6 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         }
 
         return null;
-
     }
 
     /**
