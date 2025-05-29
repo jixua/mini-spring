@@ -52,26 +52,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         return bean;
     }
 
-    private Object applyBeanPostProcessorsBeforeInstantiation(Class beanClass, String beanName) {
-        // 获取到所有的BeanPostProcess
-        List<BeanPostProcessor> beanPostProcessors = getBeanPostProcessors();
 
-        // 筛选出InstantiationAwareBeanPostProcessor类型的beanPostProcessor
-        for (BeanPostProcessor beanPostProcessor : beanPostProcessors) {
-            if (beanPostProcessor instanceof InstantiationAwareBeanPostProcessor){
-
-                // 如果前置增强执行成功返回到的Bean非空则说明该Bean是被代理Bean
-                Object bean = ((InstantiationAwareBeanPostProcessor) beanPostProcessor).postProcessBeforeInstantiation(beanClass, beanName);
-                if (bean != null){
-                    return bean;
-                }
-
-            }
-        }
-
-        return null;
-
-    }
 
     /**
      * 执行具体创建Bean的逻辑
@@ -89,7 +70,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
             applyPropertyValues(bean , beanDefinition , beanName);
 
             // 执行bean的初始化方法和BeanPostProcessor的前置和后置处理方法
-            initializeBean(beanName , bean,beanDefinition);
+            bean = initializeBean(beanName , bean,beanDefinition);
         } catch (Exception e) {
             throw new BeansException(e.getMessage(),e);
         }
@@ -120,7 +101,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
      * @param beanName Bean名称
      * @param bean Bean实例
      */
-    private void initializeBean(String beanName, Object bean,BeanDefinition beanDefinition) {
+    private Object initializeBean(String beanName, Object bean,BeanDefinition beanDefinition) {
         // 判断是否实现BeanFactoryAware接口，
         if (bean instanceof BeanFactoryAware){
             ((BeanFactoryAware)bean).setBeanFactory(this);
@@ -138,6 +119,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
         // 执行初始化之前的BeanPostProcessor后置
         wrappedBean = applyBeanPostProcessorsAfterInitialization(bean , beanName);
+
+        return wrappedBean;
     }
 
     private void invokeInitMethods(String beanName, Object bean, BeanDefinition beanDefinition) throws Exception{
@@ -212,6 +195,28 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
     // 设置实例化策略
     public void setInstantiationStrategy(InstantiationStrategy instantiationStrategy) {
         this.instantiationStrategy = instantiationStrategy;
+    }
+
+
+    private Object applyBeanPostProcessorsBeforeInstantiation(Class beanClass, String beanName) {
+        // 获取到所有的BeanPostProcess
+        List<BeanPostProcessor> beanPostProcessors = getBeanPostProcessors();
+
+        // 筛选出InstantiationAwareBeanPostProcessor类型的beanPostProcessor
+        for (BeanPostProcessor beanPostProcessor : beanPostProcessors) {
+            if (beanPostProcessor instanceof InstantiationAwareBeanPostProcessor){
+
+                // 如果前置增强执行成功返回到的Bean非空则说明该Bean是被代理Bean
+                Object bean = ((InstantiationAwareBeanPostProcessor) beanPostProcessor).postProcessBeforeInstantiation(beanClass, beanName);
+                if (bean != null){
+                    return bean;
+                }
+
+            }
+        }
+
+        return null;
+
     }
 
     /**
