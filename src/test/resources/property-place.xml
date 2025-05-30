@@ -11,7 +11,7 @@
         <property name="location" value="classpath:car.properties" />
     </bean>
 
-    <bean class="org.qlspringframework.beans.bean.Car" id="car">
+    <bean class="org.qlspringframework.test.bean.Car" id="car">
         <property name="name" value="${name}"/>
     </bean>
 

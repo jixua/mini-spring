@@ -7,10 +7,10 @@
 		 http://www.springframework.org/schema/context
 		 http://www.springframework.org/schema/context/spring-context-4.0.xsd">
 
-    <bean id="worldService" class="org.qlspringframework.beans.service.WorldServiceImpl"/>
+    <bean id="worldService" class="org.qlspringframework.test.service.WorldServiceImpl"/>
 
     <bean id="pointcutAdvisor" class="org.qlspringframework.aop.aspectj.AspectJExpressionPointcutAdvisor">
-        <property name="expression" value="execution(* org.qlspringframework.beans.service.WorldService.sayHello(..))"/>
+        <property name="expression" value="execution(* org.qlspringframework.test.service.WorldService.sayHello(..))"/>
         <property name="advice" ref="methodInterceptor"/>
     </bean>
 
@@ -22,7 +22,7 @@
         <property name="advice" ref="beforeAdvice"/>
     </bean>
 
-    <bean id="beforeAdvice" class="org.qlspringframework.beans.common.WorldServiceBeforeAdvice"/>
+    <bean id="beforeAdvice" class="org.qlspringframework.test.common.WorldServiceBeforeAdvice"/>
 
 
 
