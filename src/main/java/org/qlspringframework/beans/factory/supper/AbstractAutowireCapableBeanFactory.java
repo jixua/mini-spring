@@ -4,6 +4,7 @@ import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.StrUtil;
 import org.qlspringframework.beans.BeansException;
 import org.qlspringframework.beans.PropertyValue;
+import org.qlspringframework.beans.PropertyValues;
 import org.qlspringframework.beans.factory.BeanFactoryAware;
 import org.qlspringframework.beans.factory.DisposableBean;
 import org.qlspringframework.beans.factory.InitializingBean;
@@ -11,6 +12,8 @@ import org.qlspringframework.beans.factory.config.*;
 
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Properties;
+
 /**
  * 抽象的自动装配功能的Bean工厂类
  * 实现了Bean的创建、依赖注入、初始化以及BeanPostProcessor的处理等功能
@@ -77,7 +80,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
             // 通过InstantiationStrategy实例化Bean
             bean = createBeanInstance(beanDefinition);
 
-
+            applyBeanPostprocessorsBeforeApplyingPropertyValues(beanName, bean, beanDefinition);
 
             // 为Bean的属性进行赋值
             applyPropertyValues(bean , beanDefinition , beanName);
@@ -95,6 +98,23 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
             super.addSingletonBean(beanName, bean);
         }
         return bean;
+    }
+
+
+
+    private void applyBeanPostprocessorsBeforeApplyingPropertyValues(String beanName, Object bean, BeanDefinition beanDefinition) {
+        List<BeanPostProcessor> beanPostProcessors = getBeanPostProcessors();
+        for (BeanPostProcessor beanPostProcessor : beanPostProcessors) {
+            if (beanPostProcessor instanceof  InstantiationAwareBeanPostProcessor) {
+                PropertyValues propertyValues = ((InstantiationAwareBeanPostProcessor) beanPostProcessor).postProcessPropertyValues(beanDefinition.getPropertyValues(), bean, beanName);
+                if (propertyValues != null) {
+                    for (PropertyValue propertyValue : propertyValues.getPropertyValueList()) {
+                        beanDefinition.getPropertyValues().addPropertyValue(propertyValue);
+                    }
+                }
+
+            }
+        }
     }
 
     /**

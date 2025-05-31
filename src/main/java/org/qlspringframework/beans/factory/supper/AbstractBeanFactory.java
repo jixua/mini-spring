@@ -5,6 +5,7 @@ import org.qlspringframework.beans.factory.FactoryBean;
 import org.qlspringframework.beans.factory.config.BeanDefinition;
 import org.qlspringframework.beans.factory.config.BeanPostProcessor;
 import org.qlspringframework.beans.factory.config.ConfigurableBeanFactory;
+import org.qlspringframework.util.StringValueResolver;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,8 +26,45 @@ public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry i
      */
     private final List<BeanPostProcessor> beanPostProcessors  = new ArrayList<>();
 
-
+    /**
+     * FactoryBean缓存列表，用于存储已创建好的FactoryBean对象
+     */
     private final Map<String , Object> factoryBeanObjectCache = new HashMap<>();
+
+    /**
+     * 用于存储字符属性解析器对象，要解析的配置文件可能有多份，因此需要定义一个集合来存储
+     */
+    private final List<StringValueResolver> embeddedValueResolvers = new ArrayList<>();
+
+
+
+
+    /**
+     * 解析嵌入值，用于Value注解解析
+     *
+     * @param value
+     * @return
+     */
+    @Override
+    public String resolveEmbeddedValue(String value) {
+        String result = value;
+        for (StringValueResolver resolver : embeddedValueResolvers) {
+            // 会判断传入字段是否包含属性占位符，如果包含则替换为配置文件当中的值
+            result = resolver.resolveStringValue(result);
+        }
+        return result;
+
+    }
+
+    /**
+     * 添加属性解析器
+     *
+     * @param stringValueResolver
+     */
+    @Override
+    public void addEmbeddedValueResolver(StringValueResolver stringValueResolver) {
+        embeddedValueResolvers.add(stringValueResolver);
+    }
 
     /**
      * 添加beanPostProcessor

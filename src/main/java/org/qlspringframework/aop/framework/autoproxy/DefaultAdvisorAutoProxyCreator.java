@@ -1,6 +1,7 @@
 package org.qlspringframework.aop.framework.autoproxy;
 
 
+import org.qlspringframework.beans.PropertyValues;
 
 /**
  * DefaultAdvisorAutoProxyCreator类的作用是自动创建代理Bean，该类主要负责根据Advisor来创建代理Bean，
@@ -14,4 +15,8 @@ package org.qlspringframework.aop.framework.autoproxy;
 public class DefaultAdvisorAutoProxyCreator extends AbstractAdvisorAutoProxyCreator  {
 
 
+    @Override
+    public PropertyValues postProcessPropertyValues(PropertyValues propertyValues, Object bean, String beanName) {
+        return null;
+    }
 }

@@ -2,6 +2,7 @@ package org.qlspringframework.beans.factory.config;
 
 import org.qlspringframework.beans.factory.BeanFactory;
 import org.qlspringframework.beans.factory.HierarchicalBeanFactory;
+import org.qlspringframework.util.StringValueResolver;
 
 /**
  * ConfigurableBeanFactory 接口扩展了 BeanFactory 和 SingletonBeanRegister 接口，
@@ -25,4 +26,20 @@ public interface ConfigurableBeanFactory extends HierarchicalBeanFactory, Single
      * 销毁单例bean
      */
     void destroySingletons();
+
+
+    /**
+     * 解析嵌入值，用于Value注解解析
+     * @param value
+     * @return
+     */
+    String resolveEmbeddedValue(String value);
+
+
+    /**
+     * 添加属性解析器
+     */
+    void addEmbeddedValueResolver(StringValueResolver stringValueResolver);
+
+
 }

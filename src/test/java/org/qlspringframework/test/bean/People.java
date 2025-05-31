@@ -4,17 +4,23 @@ import org.qlspringframework.beans.factory.BeanFactory;
 import org.qlspringframework.beans.factory.BeanFactoryAware;
 import org.qlspringframework.beans.factory.DisposableBean;
 import org.qlspringframework.beans.factory.InitializingBean;
+import org.qlspringframework.beans.factory.annotation.Value;
 import org.qlspringframework.context.ApplicationContext;
 import org.qlspringframework.context.ApplicationContextAware;
+import org.qlspringframework.stereotype.Component;
 
 /**
  * @author jixu
  * @title People
  * @date 2025/4/7 09:54
  */
+@Component
 public class People implements DisposableBean, InitializingBean, BeanFactoryAware , ApplicationContextAware {
 
+
+    @Value("jixu")
     private String name;
+
     private Integer age;
 
     private Car car;

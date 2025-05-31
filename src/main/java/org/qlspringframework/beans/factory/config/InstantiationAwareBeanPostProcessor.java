@@ -1,5 +1,7 @@
 package org.qlspringframework.beans.factory.config;
 
+import org.qlspringframework.beans.PropertyValues;
+
 /**
  * @author jixu
  * @title InstantiationAwareBeanPostProcessor
@@ -11,5 +13,7 @@ public interface InstantiationAwareBeanPostProcessor extends BeanPostProcessor{
 
     Object postProcessBeforeInstantiation(Class<?> beanClass , String beanName);
 
+
+    PropertyValues postProcessPropertyValues(PropertyValues propertyValues , Object bean , String beanName);
 
 }
