@@ -6,38 +6,41 @@
 Mini-Spring  是一个简化版的 Spring 框架，抽取并还原了 Spring 的核心设计理念，保留 IoC 容器、AOP、资源加载器、事件监听器、类型转换、容器扩展点、Bean 生命周期与作用域、应用上下文等核心功能，帮助深入理解框架底层原理。
 
 ---
+## 核心模块
 
-## IOC
+### IOC容器实现
 
-- [1，如何实现一个简单的IOC容器](document/IOC/1，如何实现一个简单的IOC容器.md)
-- [2，如何通过BeanDefinition定义Bean](document/IOC/2，如何通过BeanDefinition定义Bean.md)
-- [3，如何实现资源文件的加载](document/IOC/3，如何实现资源文件的加载.md)
-- [4，如何通过XML注册Bean](document/IOC/4，如何通过XML注册Bean.md)
-- [5，PostProcess容器扩展机制](document/IOC/5，PostProcess容器扩展机制.md)
-- [6，Application应用上下文](document/IOC/6，Application应用上下文.md)
-- [7，Bean的初始化和销毁](document/IOC/7，Bean的初始化和销毁.md)
-- [8，Aware接口](document/IOC/8，Aware接口.md)
-- [9，实现scope作用域支持](document/IOC/9，实现scope作用域支持.md)
-- [10，FactoryBean](document/IOC/10，FactoryBean.md)
-- [11，ApplicationEvent事件监听器](document/IOC/9，实现scope作用域支持.md)
+- [1，IOC容器基础实现原理](document/IOC/1，IOC容器基础实现原理.md)
+- [2，BeanDefinition的定义与元数据管理](document/IOC/2，BeanDefinition的定义与元数据管理.md)
+- [3，资源文件的加载与解析机制](document/IOC/3，资源文件的加载与解析机制.md)
+- [4，基于XML的Bean注册与配置](document/IOC/4，基于XML的Bean注册与配置.md)
+- [5，容器扩展机制：PostProcessor详解](document/IOC/5，容器扩展机制：PostProcessor详解.md)
+- [6，ApplicationContext的设计与实现](document/IOC/6，ApplicationContext的设计与实现.md)
+- [7，Bean生命周期：初始化与销毁方法](document/IOC/7，Bean生命周期：初始化与销毁方法.md)
+- [8，Aware接口与容器感知能力](document/IOC/8，Aware接口与容器感知能力.md)
+- [9，Bean作用域（Scope）的实现](document/IOC/9，Bean作用域（Scope）的实现.md)
+- [10，FactoryBean的特殊实例化逻辑](document/IOC/10，FactoryBean的特殊实例化逻辑.md)
+- [11，ApplicationEvent事件监听器](document/IOC/9，Bean作用域（Scope）的实现.md)
 - [12，SpringIOC容器总结](document/IOC/12，SpringIOC容器总结.md)
 
-## AOP
+### AOP实现
 
 -  [AOP相关核心概念与作用说明（补充）](document/AOP/AOP相关核心概念与作用说明（补充）.md)
-- [1，PointCut切入点](document/AOP/1，PointCut切入点.md)
+- [1，切入点（PointCut）的实现原理](document/AOP/1，切入点（PointCut）的实现原理.md)
 - [2，AOP动态代理](document/AOP/2，AOP动态代理.md)
-- [3，ProxyFactory代理工厂](document/AOP/3，ProxyFactory代理工厂类.md)
-- [4，Advice横切关注点的逻辑实现](document/AOP/4，Advice横切关注点的逻辑实现.md)
-- [5，Advisor增强规则](document/AOP/5，Advisor增强规则.md)
-- [6，在Spring生命周期中织入代理逻辑](document/AOP/6，在Spring生命周期中织入代理逻辑.md)
+- [3，ProxyFactory代理工厂](document/AOP/3，ProxyFactory代理工厂设计.md)
+- [4，Advice通知类型的实现逻辑](document/AOP/4，Advice通知类型的实现逻辑.md)
+- [5，Advisor增强规则与组合逻辑](document/AOP/5，Advisor增强规则与组合逻辑.md)
+- [6，代理对象在生命周期中的织入时机](document/AOP/6，代理对象在生命周期中的织入时机.md)
 
 
-## 扩展
+### 拓展功能
+#### 注解配置
 
 - [1，属性占位符解析](document/扩展/1，属性占位符解析.md)
-- [2，包扫描与注解配置](document/扩展/2，包扫描与注解配置.md)
-
+- [2，包扫描与包扫描与Component注解配置](document/扩展/2，组件扫描与@Component注解原理.md)
+- [3，@Value注解的依赖注入实现](document/扩展/3，@Value注解的依赖注入实现.md)
+- [4，@Autowired自动装配的实现机制](document/扩展/4，@Autowired自动装配的实现机制.md)
 
 ---
 
