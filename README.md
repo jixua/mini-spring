@@ -33,6 +33,10 @@ Mini-Spring  是一个简化版的 Spring 框架，抽取并还原了 Spring �
 - [6，在Spring生命周期中织入代理逻辑](document/AOP/6，在Spring生命周期中织入代理逻辑.md)
 
 
+## 扩展
+
+- [1，属性占位符解析](document/扩展/1，属性占位符解析.md)
+- [2，包扫描与注解配置](document/扩展/2，包扫描与注解配置.md)
 
 
 ---
