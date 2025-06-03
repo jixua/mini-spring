@@ -42,6 +42,8 @@ Mini-Spring  是一个简化版的 Spring 框架，抽取并还原了 Spring �
 - [3，@Value注解的依赖注入实现](document/扩展/3，@Value注解的依赖注入实现.md)
 - [4，@Autowired自动装配的实现机制](document/扩展/4，@Autowired自动装配的实现机制.md)
 
+
+
 ---
 
 ## 开发计划
@@ -49,8 +51,8 @@ Mini-Spring  是一个简化版的 Spring 框架，抽取并还原了 Spring �
 - [x] 完善 IoC 容器，Bean生命周期管理
 - [x] 实现事件机制
 - [x] 实现容器扩展点
-- [ ] 构建 AOP 框架
-- [ ] 支持注解配置
+- [x] 构建 AOP 框架
+- [x] 支持注解配置
 - [ ] 类型转换
 - [ ] 循环依赖
 
