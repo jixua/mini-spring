@@ -36,5 +36,17 @@ public class TypeConversionFirstPartTest {
         Assert.assertTrue(aTrue);
     }
 
+    @Test
+    public void testGenericConversionService(){
+        GenericConversionService conversionService = new GenericConversionService();
+        conversionService.addConverter(new StringToIntegerConverter());
+        Integer integer = conversionService.convert("10", Integer.class);
+        Assert.assertEquals(Integer.valueOf(10),integer);
 
+        conversionService.addConverterFactory(new StringToNumberConverterFactory());
+        Long aLong = conversionService.convert("10", Long.class);
+        Assert.assertEquals(Long.valueOf(10),aLong);
+
+
+    }
 }
