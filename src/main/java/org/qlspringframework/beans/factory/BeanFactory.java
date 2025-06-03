@@ -15,6 +15,22 @@ public interface BeanFactory {
     public Object getBean(String name);
 
 
+    /**
+     * 根据bean的名称和类型获取指定的bean实例
+     *
+     * @param name bean的名称，用于标识特定的bean实例
+     * @param requiredType 指定的bean类型，用于确保返回的bean实例是所需的类型
+     * @param <T> 泛型参数，表示所需的bean类型
+     * @return 返回指定类型的bean实例
+     */
     public <T> T getBean(String name, Class<T> requiredType);
 
+    /**
+     * 根据指定的类型获取bean实例当有多个相同类型的bean时，此方法可能抛出异常
+     *
+     * @param requiredType 指定的bean类型，用于确保返回的bean实例是所需的类型
+     * @param <T> 泛型参数，表示所需的bean类型
+     * @return 返回指定类型的bean实例
+     */
+    public <T> T getBean(Class<T> requiredType);
 }

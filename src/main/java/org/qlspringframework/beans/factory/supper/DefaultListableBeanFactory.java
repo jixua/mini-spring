@@ -1,11 +1,10 @@
 package org.qlspringframework.beans.factory.supper;
 
+import org.qlspringframework.beans.BeansException;
 import org.qlspringframework.beans.factory.ConfigurableListableBeanFactory;
 import org.qlspringframework.beans.factory.config.BeanDefinition;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * 默认的可列出Bean的工厂类，继承了AbstractAutowireCapableBeanFactory并实现了BeanDefinitionRegister和ConfigurableListableBeanFactory接口。
@@ -84,6 +83,23 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
     public String[] getBeanDefinitionNames() {
         Set<String> beanDefinitionNames = beanDefinitionMap.keySet();
         return beanDefinitionNames.toArray(new String[beanDefinitionNames.size()]);
+    }
+
+    @Override
+    public <T> T getBean(Class<T> requiredType) throws BeansException {
+        List<String> beanNames = new ArrayList<>();
+        for (Map.Entry<String, BeanDefinition> entry : beanDefinitionMap.entrySet()) {
+            Class beanClass = entry.getValue().getBeanClass();
+            if (requiredType.isAssignableFrom(beanClass)) {
+                beanNames.add(entry.getKey());
+            }
+        }
+        if (beanNames.size() == 1) {
+            return super.getBean(beanNames.get(0), requiredType);
+        }
+
+        throw new BeansException(requiredType + "expected single bean but found " +
+                beanNames.size() + ": " + beanNames);
     }
 
 

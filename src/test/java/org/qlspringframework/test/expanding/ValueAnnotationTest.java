@@ -17,5 +17,6 @@ public class ValueAnnotationTest {
         ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:value-annotation.xml");
         People people = applicationContext.getBean("people", People.class);
         Assert.assertEquals(people.getName(),"jixu");
+        Assert.assertEquals(people.getSex(),"man");
     }
 }

@@ -23,23 +23,25 @@ public interface ConfigurableBeanFactory extends HierarchicalBeanFactory, Single
 
 
     /**
-     * 销毁单例bean
+     * 销毁单例bean，释放内存资源
      */
     void destroySingletons();
 
 
     /**
      * 解析嵌入值，用于Value注解解析
-     * @param value
-     * @return
+     * @param value 待解析的字符串，可能包含占位符
+     * @return 解析后的字符串，占位符被实际值替换
      */
     String resolveEmbeddedValue(String value);
 
 
     /**
-     * 添加属性解析器
+     * 添加属性解析器，以便在解析嵌入值时使用
+     * @param stringValueResolver 属性解析器，用于解析字符串中的占位符
      */
     void addEmbeddedValueResolver(StringValueResolver stringValueResolver);
+
 
 
 }

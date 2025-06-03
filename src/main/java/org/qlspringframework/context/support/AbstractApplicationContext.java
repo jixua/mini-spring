@@ -1,5 +1,6 @@
 package org.qlspringframework.context.support;
 
+import org.qlspringframework.beans.BeansException;
 import org.qlspringframework.beans.factory.ConfigurableListableBeanFactory;
 import org.qlspringframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.qlspringframework.beans.factory.config.BeanPostProcessor;
@@ -220,6 +221,11 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
     @Override
     public Object getBean(String name) {
         return getBeanFactory().getBean(name);
+    }
+
+    @Override
+    public <T> T getBean(Class<T> requiredType) throws BeansException {
+        return getBeanFactory().getBean(requiredType);
     }
 
     @Override

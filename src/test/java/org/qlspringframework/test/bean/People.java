@@ -4,10 +4,12 @@ import org.qlspringframework.beans.factory.BeanFactory;
 import org.qlspringframework.beans.factory.BeanFactoryAware;
 import org.qlspringframework.beans.factory.DisposableBean;
 import org.qlspringframework.beans.factory.InitializingBean;
+import org.qlspringframework.beans.factory.annotation.Autowired;
 import org.qlspringframework.beans.factory.annotation.Value;
 import org.qlspringframework.context.ApplicationContext;
 import org.qlspringframework.context.ApplicationContextAware;
 import org.qlspringframework.stereotype.Component;
+import org.qlspringframework.test.service.HelloService;
 
 /**
  * @author jixu
@@ -20,6 +22,16 @@ public class People implements DisposableBean, InitializingBean, BeanFactoryAwar
 
     @Value("jixu")
     private String name;
+
+    @Value("${sex}")
+    private String sex;
+
+    @Autowired
+    private HelloService helloService;
+
+    public HelloService getHelloService() {
+        return helloService;
+    }
 
     private Integer age;
 
@@ -89,5 +101,13 @@ public class People implements DisposableBean, InitializingBean, BeanFactoryAwar
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
+    }
+
+    public String getSex() {
+        return sex;
+    }
+
+    public void setSex(String sex) {
+        this.sex = sex;
     }
 }

@@ -5,6 +5,7 @@ import org.qlspringframework.beans.PropertyValue;
 import org.qlspringframework.beans.PropertyValues;
 import org.qlspringframework.beans.factory.BeanFactory;
 import org.qlspringframework.beans.factory.BeanFactoryAware;
+import org.qlspringframework.beans.factory.config.BeanReference;
 import org.qlspringframework.beans.factory.config.ConfigurableBeanFactory;
 import org.qlspringframework.beans.factory.config.InstantiationAwareBeanPostProcessor;
 import org.qlspringframework.stereotype.Component;
@@ -43,12 +44,37 @@ public class AutowiredAnnotationBeanPostProcessor implements InstantiationAwareB
                 value = beanFactory.resolveEmbeddedValue(value);
                 // 将解析完毕的字段添加到类属性当中
                 // BeanUtil.setFieldValue(bean,field.getName(),value);
-
-
                 pvs.addPropertyValue(new PropertyValue(field.getName(), value));
 
             }
         }
+
+
+        // 解析Autowired
+        for (Field field : declaredFields) {
+            Autowired autowired = field.getAnnotation(Autowired.class);
+            if (autowired != null){
+                Class<?> type = field.getType();
+
+                String dependentBeanName = null;
+                // 判断是否指定Bean名称
+                Qualifier qualifier = field.getAnnotation(Qualifier.class);
+                Object dependentBean = null;
+                if (qualifier != null){
+                    dependentBeanName = qualifier.value();
+                    dependentBean = beanFactory.getBean(dependentBeanName);
+                }else {
+                    dependentBean = beanFactory.getBean(type);
+                }
+
+                // 在Spring原生的逻辑当中较为复杂，这里只通过反射直接字段注入注入
+                BeanUtil.setFieldValue(bean, field.getName(), dependentBean);
+                // pvs.addPropertyValue(new PropertyValue(field.getName(), dependentBean));
+            }
+
+
+        }
+
 
         return pvs;
     }
