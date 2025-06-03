@@ -37,10 +37,15 @@ Mini-Spring  是一个简化版的 Spring 框架，抽取并还原了 Spring �
 ### 拓展功能
 #### 注解配置
 
-- [1，属性占位符解析](document/扩展/1，属性占位符解析.md)
-- [2，包扫描与包扫描与Component注解配置](document/扩展/2，组件扫描与@Component注解原理.md)
-- [3，@Value注解的依赖注入实现](document/扩展/3，@Value注解的依赖注入实现.md)
-- [4，@Autowired自动装配的实现机制](document/扩展/4，@Autowired自动装配的实现机制.md)
+- [1，属性占位符解析](document/扩展/注解配置/1，属性占位符解析.md)
+- [2，包扫描与包扫描与Component注解配置](document/扩展/注解配置/2，组件扫描与@Component注解原理.md)
+- [3，@Value注解的依赖注入实现](document/扩展/注解配置/3，@Value注解的依赖注入实现.md)
+- [4，@Autowired自动装配的实现机制](document/扩展/注解配置/4，@Autowired自动装配的实现机制.md)
+
+#### 类型转换
+
+- [1，类型转换器相关接口和实现](document/扩展/类型转换/1，类型转换器相关接口和实现.md)
+
 
 
 
