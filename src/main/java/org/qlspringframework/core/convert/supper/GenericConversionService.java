@@ -14,6 +14,9 @@ import java.util.*;
 import static org.aspectj.apache.bcel.Constants.types;
 
 /**
+ * 通用转换服务类，实现ConversionService接口和ConverterRegister接口
+ * 提供类型转换功能和转换器注册功能
+ *
  * @author jixu
  * @title GenericConversionService
  * @date 2025/6/3 17:14
@@ -53,9 +56,9 @@ public class GenericConversionService implements ConversionService, ConverterReg
 
     /**
      * 获取通用适配器
-     * @param sourceType
-     * @param targetType
-     * @return
+     * @param sourceType 源类型的Class对象
+     * @param targetType 目标类型的Class对象
+     * @return 对应的GenericConverter对象，如果不存在则返回null
      */
     protected GenericConverter getConverter(Class<?> sourceType, Class<?> targetType){
         List<Class<?>> sourceHierarchy = getClassHierarchy(sourceType);
@@ -69,7 +72,7 @@ public class GenericConversionService implements ConversionService, ConverterReg
                     return genericConverter;
                 }
             }
-            
+
         }
         return null;
     }
@@ -97,6 +100,13 @@ public class GenericConversionService implements ConversionService, ConverterReg
     }
 
     @Override
+    public void addConverter(GenericConverter converter) {
+        for (ConvertiblePair convertibleType : converter.getConvertibleTypes()) {
+            converters.put(convertibleType, converter);
+        }
+    }
+
+    @Override
     public void addConverterFactory(ConverterFactory converterFactory) {
         ConvertiblePair requiredTypeInfo = getRequiredTypeInfo(converterFactory);
         ConverterFactoryAdapter converterFactoryAdapter = new ConverterFactoryAdapter(converterFactory, requiredTypeInfo);
@@ -108,8 +118,8 @@ public class GenericConversionService implements ConversionService, ConverterReg
 
     /**
      * 获取到目标类所实现的泛型接口的元素
-     * @param object
-     * @return
+     * @param object 要分析的对象
+     * @return ConvertiblePair对象，包含源类型和目标类型
      */
     private ConvertiblePair getRequiredTypeInfo(Object object){
         Type[] types = object.getClass().getGenericInterfaces();
