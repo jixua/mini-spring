@@ -11,12 +11,13 @@ import org.qlspringframework.context.ApplicationContextAware;
 import org.qlspringframework.stereotype.Component;
 import org.qlspringframework.test.service.HelloService;
 
+
 /**
  * @author jixu
  * @title People
  * @date 2025/4/7 09:54
  */
-@Component
+// @Component
 public class People implements DisposableBean, InitializingBean, BeanFactoryAware , ApplicationContextAware {
 
 

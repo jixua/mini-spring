@@ -18,6 +18,9 @@ public class DefaultSingletonBeanRegistry implements SingletonBeanRegistry {
     // 保存单列Bean的地方
     private Map<String , Object> singletonObjects = new ConcurrentHashMap<>();
 
+    // 二级缓存，保存实例化后的Bean
+    protected Map<String , Object> earlySingletonObjects = new ConcurrentHashMap<>();
+
     // 保存含有销毁方法的Bean的地方
     private Map<String , DisposableBean> disposableBeans = new ConcurrentHashMap<>();
 
@@ -50,7 +53,11 @@ public class DefaultSingletonBeanRegistry implements SingletonBeanRegistry {
      */
     @Override
     public Object getSingletonBean(String beanName) {
-        return singletonObjects.get(beanName);
+        Object singletonObejct = singletonObjects.get(beanName);
+        if (singletonObejct == null){
+            singletonObejct = earlySingletonObjects.get(beanName);
+        }
+        return singletonObejct;
     }
 
     /**

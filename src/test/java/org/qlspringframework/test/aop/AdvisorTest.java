@@ -26,7 +26,7 @@ public class AdvisorTest {
         // 创建Advisor对象
         AspectJExpressionPointcutAdvisor advisor = new AspectJExpressionPointcutAdvisor();
         // 设置切点表达式
-        advisor.setExpression("execution(* org.qlspringframework.beans.service.WorldService.sayHello(..))");
+        advisor.setExpression("execution(* org.qlspringframework.test.service.WorldService.sayHello(..))");
         MethodBeforeAdviceInterceptor adviceInterceptor = new MethodBeforeAdviceInterceptor(new WorldServiceBeforeAdvice());
         advisor.setAdvice(adviceInterceptor);
 

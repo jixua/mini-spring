@@ -82,6 +82,9 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
             // 通过InstantiationStrategy实例化Bean
             bean = createBeanInstance(beanDefinition);
 
+            // 提前暴露Bean
+            super.earlySingletonObjects.put(beanName,bean);
+
             // 在赋值之前执行占位符替换逻辑
             applyBeanPostprocessorsBeforeApplyingPropertyValues(beanName, bean, beanDefinition);
 

@@ -37,7 +37,7 @@ public class DynamicProxyTest {
         advisedSupper.setMethodInterceptor(interceptor);
 
         // 创建PointCut解析器
-        AspectJExpressionPointcut pointcut = new AspectJExpressionPointcut("execution(* org.qlspringframework.beans.service.WorldService.sayHello(..))");
+        AspectJExpressionPointcut pointcut = new AspectJExpressionPointcut("execution(* org.qlspringframework.test.service.WorldService.sayHello(..))");
         MethodMatcher methodMatcher = pointcut.getMethodMatcher();
         advisedSupper.setMethodMatcher(methodMatcher);
     }

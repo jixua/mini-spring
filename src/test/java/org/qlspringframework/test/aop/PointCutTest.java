@@ -16,7 +16,7 @@ public class PointCutTest {
 
     @Test
     public void testPointCut() throws NoSuchMethodException {
-        AspectJExpressionPointcut pointcut = new AspectJExpressionPointcut("execution(* org.qlspringframework.beans.ioc.service.HelloService.*(..))");
+        AspectJExpressionPointcut pointcut = new AspectJExpressionPointcut("execution(* org.qlspringframework.test.service.HelloService.*(..))");
 
         Class<HelloService> helloServiceClass = HelloService.class;
         Method declaredMethod = helloServiceClass.getDeclaredMethod("say");
