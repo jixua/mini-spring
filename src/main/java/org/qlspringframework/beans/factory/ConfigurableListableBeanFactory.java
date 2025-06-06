@@ -4,6 +4,7 @@ import org.qlspringframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.qlspringframework.beans.factory.config.BeanDefinition;
 import org.qlspringframework.beans.factory.config.BeanPostProcessor;
 import org.qlspringframework.beans.factory.config.ConfigurableBeanFactory;
+import org.qlspringframework.core.convert.ConversionService;
 
 /**
  * ConfigurableListableBeanFactory 接口扩展了 ListableBeanFactory 接口，提供了对 Bean 工厂的配置和列表功能。
@@ -22,5 +23,10 @@ public interface ConfigurableListableBeanFactory extends ListableBeanFactory , A
 
 
     void preInstantiateSingletons();
+
+
+    void setConversionService(ConversionService conversionService);
+
+    ConversionService getConversionService();
 }
 

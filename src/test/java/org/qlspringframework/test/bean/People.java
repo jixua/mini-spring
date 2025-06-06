@@ -33,6 +33,7 @@ public class People implements DisposableBean, InitializingBean, BeanFactoryAwar
         return helloService;
     }
 
+    // @Value("10")
     private Integer age;
 
     private Car car;

@@ -1,13 +1,16 @@
 package org.qlspringframework.beans.factory.annotation;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.TypeUtil;
 import org.qlspringframework.beans.PropertyValue;
 import org.qlspringframework.beans.PropertyValues;
 import org.qlspringframework.beans.factory.BeanFactory;
 import org.qlspringframework.beans.factory.BeanFactoryAware;
+import org.qlspringframework.beans.factory.ConfigurableListableBeanFactory;
 import org.qlspringframework.beans.factory.config.BeanReference;
 import org.qlspringframework.beans.factory.config.ConfigurableBeanFactory;
 import org.qlspringframework.beans.factory.config.InstantiationAwareBeanPostProcessor;
+import org.qlspringframework.core.convert.ConversionService;
 import org.qlspringframework.stereotype.Component;
 
 import java.lang.reflect.Field;
@@ -22,7 +25,7 @@ import java.lang.reflect.Field;
 public class AutowiredAnnotationBeanPostProcessor implements InstantiationAwareBeanPostProcessor , BeanFactoryAware {
 
 
-    private ConfigurableBeanFactory beanFactory;
+    private ConfigurableListableBeanFactory beanFactory;
 
 
     @Override
@@ -38,10 +41,24 @@ public class AutowiredAnnotationBeanPostProcessor implements InstantiationAwareB
             // 获取到标记Value注解的属性
             Value valueAnnotation = field.getAnnotation(Value.class);
             if (valueAnnotation != null){
-                String value = valueAnnotation.value();
+                Object value = valueAnnotation.value();
 
                 // 解析Value的属性值，判断是否需要替换占位符
-                value = beanFactory.resolveEmbeddedValue(value);
+                value = beanFactory.resolveEmbeddedValue((String) value);
+
+                Class<?> sourceClass = value.getClass();
+                Class<?> targetType = (Class<?>) TypeUtil.getType(field);
+
+                // 类型转换
+                ConversionService conversionService = beanFactory.getConversionService();
+                if (conversionService != null){
+                    boolean canConvert = conversionService.canConvert(sourceClass, targetType);
+                    if (canConvert){
+                        value = conversionService.convert(value,targetType);
+                    }
+
+                }
+
                 // 将解析完毕的字段添加到类属性当中
                 // BeanUtil.setFieldValue(bean,field.getName(),value);
                 pvs.addPropertyValue(new PropertyValue(field.getName(), value));
@@ -116,6 +133,6 @@ public class AutowiredAnnotationBeanPostProcessor implements InstantiationAwareB
 
     @Override
     public void setBeanFactory(BeanFactory beanFactory) {
-        this.beanFactory = (ConfigurableBeanFactory) beanFactory;
+        this.beanFactory = (ConfigurableListableBeanFactory) beanFactory;
     }
 }

@@ -5,6 +5,7 @@ import org.qlspringframework.beans.factory.FactoryBean;
 import org.qlspringframework.beans.factory.config.BeanDefinition;
 import org.qlspringframework.beans.factory.config.BeanPostProcessor;
 import org.qlspringframework.beans.factory.config.ConfigurableBeanFactory;
+import org.qlspringframework.core.convert.ConversionService;
 import org.qlspringframework.util.StringValueResolver;
 
 import java.util.ArrayList;
@@ -35,6 +36,11 @@ public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry i
      * 用于存储字符属性解析器对象，要解析的配置文件可能有多份，因此需要定义一个集合来存储
      */
     private final List<StringValueResolver> embeddedValueResolvers = new ArrayList<>();
+
+    /**
+     * 类型转换器
+     */
+    private ConversionService conversionService;
 
 
 
@@ -178,4 +184,27 @@ public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry i
      */
     protected abstract BeanDefinition getBeanDefinition(String beanName) ;
 
+
+    protected abstract boolean containsBeanDefinition(String name);
+
+
+    @Override
+    public boolean containsBean(String name) {
+        return containsBeanDefinition(name);
+    }
+
+
+
+
+    public Map<String, Object> getFactoryBeanObjectCache() {
+        return factoryBeanObjectCache;
+    }
+
+    public void setConversionService(ConversionService conversionService) {
+        this.conversionService = conversionService;
+    }
+
+    public ConversionService getConversionService() {
+        return conversionService;
+    }
 }

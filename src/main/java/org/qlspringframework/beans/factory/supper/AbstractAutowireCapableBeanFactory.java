@@ -2,6 +2,7 @@ package org.qlspringframework.beans.factory.supper;
 
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.util.TypeUtil;
 import org.qlspringframework.beans.BeansException;
 import org.qlspringframework.beans.PropertyValue;
 import org.qlspringframework.beans.PropertyValues;
@@ -9,6 +10,7 @@ import org.qlspringframework.beans.factory.BeanFactoryAware;
 import org.qlspringframework.beans.factory.DisposableBean;
 import org.qlspringframework.beans.factory.InitializingBean;
 import org.qlspringframework.beans.factory.config.*;
+import org.qlspringframework.core.convert.ConversionService;
 
 import java.lang.reflect.Method;
 import java.util.List;
@@ -80,6 +82,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
             // 通过InstantiationStrategy实例化Bean
             bean = createBeanInstance(beanDefinition);
 
+            // 在赋值之前执行占位符替换逻辑
             applyBeanPostprocessorsBeforeApplyingPropertyValues(beanName, bean, beanDefinition);
 
             // 为Bean的属性进行赋值
@@ -218,7 +221,20 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
                 if (value instanceof BeanReference){
                     BeanReference beanReference = (BeanReference) value;
                     value = super.getBean(beanReference.getBeanName());
+                }else {
+                    Class<?> sourceClass = value.getClass();
+                    Class<?> targetType = (Class<?>) TypeUtil.getFieldType(bean.getClass(), name);
+
+                    ConversionService conversionService = getConversionService();
+                    if (conversionService != null) {
+                        boolean canConvert = conversionService.canConvert(sourceClass, targetType);
+                        if (canConvert) {
+                            value = conversionService.convert(value, targetType);
+                        }
+                    }
                 }
+
+
 
                 // 通过属性的set方法设置属性
                 String setMethodName = "set" + name.substring(0, 1).toUpperCase() + name.substring(1);

@@ -33,4 +33,7 @@ public interface BeanFactory {
      * @return 返回指定类型的bean实例
      */
     public <T> T getBean(Class<T> requiredType);
+
+
+    boolean containsBean(String name);
 }
