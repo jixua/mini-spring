@@ -2,7 +2,7 @@ package org.qlspringframework.test.aop;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.qlspringframework.aop.AdvisedSupper;
+import org.qlspringframework.aop.AdvisedSupport;
 import org.qlspringframework.aop.MethodMatcher;
 import org.qlspringframework.aop.TargetSource;
 import org.qlspringframework.aop.aspectj.AspectJExpressionPointcut;
@@ -22,7 +22,7 @@ import org.qlspringframework.test.service.WorldServiceImpl;
  */
 public class DynamicProxyTest {
 
-    public AdvisedSupper advisedSupper = new AdvisedSupper();
+    public AdvisedSupport advisedSupport = new AdvisedSupport();
 
     @Before
     public void setup(){
@@ -30,22 +30,22 @@ public class DynamicProxyTest {
         WorldServiceImpl worldService = new WorldServiceImpl();
         // 封装为目标资源对象
         TargetSource targetSource = new TargetSource(worldService);
-        advisedSupper.setTargetSource(targetSource);
+        advisedSupport.setTargetSource(targetSource);
 
         // 创建拦截器对象
         WorldServiceInterceptor interceptor = new WorldServiceInterceptor();
-        advisedSupper.setMethodInterceptor(interceptor);
+        advisedSupport.setMethodInterceptor(interceptor);
 
         // 创建PointCut解析器
         AspectJExpressionPointcut pointcut = new AspectJExpressionPointcut("execution(* org.qlspringframework.test.service.WorldService.sayHello(..))");
         MethodMatcher methodMatcher = pointcut.getMethodMatcher();
-        advisedSupper.setMethodMatcher(methodMatcher);
+        advisedSupport.setMethodMatcher(methodMatcher);
     }
 
 
     @Test
     public void testJdkDynamicProxy(){
-        JdkDynamicAopProxy jdkDynamicAopProxy = new JdkDynamicAopProxy(advisedSupper);
+        JdkDynamicAopProxy jdkDynamicAopProxy = new JdkDynamicAopProxy(advisedSupport);
         WorldService proxy = (WorldService) jdkDynamicAopProxy.getProxy();
         proxy.sayHello();
 
@@ -56,7 +56,7 @@ public class DynamicProxyTest {
     @Test
     public void testCglibDynamicProxy(){
         // 创建Cglib代理对象
-        CglibDynamicAopProxy cglibDynamicAopProxy = new CglibDynamicAopProxy(advisedSupper);
+        CglibDynamicAopProxy cglibDynamicAopProxy = new CglibDynamicAopProxy(advisedSupport);
         WorldService proxy = (WorldService) cglibDynamicAopProxy.getProxy();
         proxy.sayHello();
 
@@ -64,8 +64,8 @@ public class DynamicProxyTest {
 
     @Test
     public void testProxyFactory(){
-        advisedSupper.setProxyTargetClass(true);
-        ProxyFactory proxyFactory = new ProxyFactory(advisedSupper);
+        advisedSupport.setProxyTargetClass(true);
+        ProxyFactory proxyFactory = new ProxyFactory(advisedSupport);
         WorldService worldService = (WorldService) proxyFactory.getProxy();
         worldService.sayHello();
 
@@ -76,9 +76,9 @@ public class DynamicProxyTest {
     public void testBeforeAdvice(){
         WorldServiceBeforeAdvice advice = new WorldServiceBeforeAdvice();
         MethodBeforeAdviceInterceptor methodInterceptor = new MethodBeforeAdviceInterceptor(advice);
-        advisedSupper.setMethodInterceptor(methodInterceptor);
+        advisedSupport.setMethodInterceptor(methodInterceptor);
 
-        CglibDynamicAopProxy cglibDynamicAopProxy = new CglibDynamicAopProxy(advisedSupper);
+        CglibDynamicAopProxy cglibDynamicAopProxy = new CglibDynamicAopProxy(advisedSupport);
         WorldService proxy = (WorldService) cglibDynamicAopProxy.getProxy();
         proxy.sayHello();
     }

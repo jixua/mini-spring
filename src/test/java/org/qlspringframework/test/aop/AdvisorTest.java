@@ -2,7 +2,7 @@ package org.qlspringframework.test.aop;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.junit.Test;
-import org.qlspringframework.aop.AdvisedSupper;
+import org.qlspringframework.aop.AdvisedSupport;
 import org.qlspringframework.aop.ClassFilter;
 import org.qlspringframework.aop.TargetSource;
 import org.qlspringframework.aop.aspectj.AspectJExpressionPointcutAdvisor;
@@ -33,12 +33,12 @@ public class AdvisorTest {
         ClassFilter classFilter = advisor.getPointcut().getClassFilter();
         if (classFilter.matches(WorldService.class)){
 
-            AdvisedSupper advisedSupper = new AdvisedSupper();
-            advisedSupper.setMethodMatcher(advisor.getPointcut().getMethodMatcher());
-            advisedSupper.setTargetSource(new TargetSource(new WorldServiceImpl()));
-            advisedSupper.setMethodInterceptor((MethodInterceptor)advisor.getAdvice());
+            AdvisedSupport advisedSupport = new AdvisedSupport();
+            advisedSupport.setMethodMatcher(advisor.getPointcut().getMethodMatcher());
+            advisedSupport.setTargetSource(new TargetSource(new WorldServiceImpl()));
+            advisedSupport.setMethodInterceptor((MethodInterceptor)advisor.getAdvice());
 
-            WorldService worldService = (WorldService) new ProxyFactory(advisedSupper).getProxy();
+            WorldService worldService = (WorldService) new ProxyFactory(advisedSupport).getProxy();
             worldService.sayHello();
         }
     }

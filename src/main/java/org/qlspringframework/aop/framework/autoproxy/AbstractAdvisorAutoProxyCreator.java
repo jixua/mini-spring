@@ -125,13 +125,15 @@ public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyC
                     Object beanInstantiate = beanFactory.getInstantiationStrategy().instantiate(beanDefinition);
                     TargetSource targetSource = new TargetSource(beanInstantiate);
 
-                    advisedSupper.setMethodInterceptor(((MethodInterceptor) advisor.getAdvice()));
-                    advisedSupper.setTargetSource(targetSource);
-                    advisedSupper.setMethodMatcher(advisor.getPointcut().getMethodMatcher());
-
-                    Object proxy = new ProxyFactory(advisedSupper).getProxy();
-                    return proxy;
-
+                ClassFilter classFilter = advisor.getPointcut().getClassFilter();
+                if (classFilter.matches(bean.getClass())) {
+                    AdvisedSupport advisedSupport = new AdvisedSupport();
+                    TargetSource targetSource = new TargetSource(bean);
+                    advisedSupport.setTargetSource(targetSource);
+                    advisedSupport.setMethodInterceptor((MethodInterceptor) advisor.getAdvice());
+                    advisedSupport.setMethodMatcher(advisor.getPointcut().getMethodMatcher());
+                    //返回代理对象
+                    return new ProxyFactory(advisedSupport).getProxy();
                 }
             }
         } catch (Exception e) {
