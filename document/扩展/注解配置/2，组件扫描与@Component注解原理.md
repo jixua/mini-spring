@@ -93,11 +93,11 @@ public class ClassPathScanningCandidateComponentProvider {
 继承扫描器，实现更完整的处理逻辑：
 
 - 解析作用域（`@Scope`）；
-    
+
 - 解析 Bean 名称（默认类名首字母小写）；
-    
+
 - 完成 BeanDefinition 的注册。
-    
+
 
 ```java
 public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateComponentProvider {

@@ -116,14 +116,14 @@ public void setup(){
 	// 被代理对象
     WorldServiceImpl worldService = new WorldServiceImpl();  
     TargetSource targetSource = new TargetSource(worldService);  
-    advisedSupper.setTargetSource(targetSource);  
+    advisedSupport.setTargetSource(targetSource);  
   
     WorldServiceInterceptor interceptor = new WorldServiceInterceptor();  
-    advisedSupper.setMethodInterceptor(interceptor);  
+    advisedSupport.setMethodInterceptor(interceptor);  
     // "execution(* org.springframework.test.service.WorldService.explode(..))"  
     AspectJExpressionPointcut pointcut = new AspectJExpressionPointcut("execution(* org.qlspringframework.beans.service.WorldService.sayHello(..))");  
     MethodMatcher methodMatcher = pointcut.getMethodMatcher();  
-    advisedSupper.setMethodMatcher(methodMatcher);  
+    advisedSupport.setMethodMatcher(methodMatcher);  
 }
 
 
@@ -131,9 +131,9 @@ public void setup(){
 public void testBeforeAdvice(){  
     WorldServiceBeforeAdvice advice = new WorldServiceBeforeAdvice();  
     MethodBeforeAdviceInterceptor methodInterceptor = new MethodBeforeAdviceInterceptor(advice);  
-    advisedSupper.setMethodInterceptor(methodInterceptor);  
+    advisedSupport.setMethodInterceptor(methodInterceptor);  
   
-    CglibDynamicAopProxy cglibDynamicAopProxy = new CglibDynamicAopProxy(advisedSupper);  
+    CglibDynamicAopProxy cglibDynamicAopProxy = new CglibDynamicAopProxy(advisedSupport);  
     WorldService proxy = (WorldService) cglibDynamicAopProxy.getProxy();  
     proxy.sayHello();  
 }

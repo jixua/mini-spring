@@ -279,7 +279,7 @@ AdvisedSupper类是用于配置和管理目标源、方法匹配器和方法拦�
  * 它提供了一种机制，用于在满足特定条件时，对目标源的方法调用进行拦截和处理
  * 
  * @author jixu
- * @title AdvisedSupper
+ * @title AdvisedSupport
  * @date 2025/5/21 21:49
  */
 public class AdvisedSupper {
@@ -358,14 +358,14 @@ JdkDynamicAopProxy类实现了AopProxy和InvocationHandler接口
 
 ```java
 public Object getProxy() {
-        return Proxy.newProxyInstance(getClass().getClassLoader(),advisedSupper.getTargetSource().getTargetClass(), this);
+        return Proxy.newProxyInstance(getClass().getClassLoader(),advisedSupport.getTargetSource().getTargetClass(), this);
     }
 ```
 
 实现InvocationHandler的invoke方法，在调用代理类的方法时通过JVM生成的代理对象调用该invoke方法。同时在invoke当中通过所解析的切点表达式判断是否为被代理方法
 
 ```java
-if (advisedSupper.getMethodMatcher().matches(method,advisedSupper.getTargetSource().getTarget().getClass())){
+if (advisedSupport.getMethodMatcher().matches(method,advisedSupport.getTargetSource().getTarget().getClass())){
 ```
 
 如果是获取到对应的方法拦截器，调用方法拦截器的invoke方法执行具体增强的代码逻辑
@@ -382,15 +382,15 @@ if (advisedSupper.getMethodMatcher().matches(method,advisedSupper.getTargetSourc
 public class JdkDynamicAopProxy implements AopProxy , InvocationHandler {
 
     // AdvisedSupper对象包含了代理所需的配置信息，如目标源、方法匹配器和方法拦截器。
-    private final AdvisedSupper advisedSupper;
+    private final AdvisedSupper advisedSupport;
 
     /**
      * 构造函数，接收一个AdvisedSupper对象来初始化JdkDynamicAopProxy。
      * 
-     * @param advisedSupper 包含代理配置信息的对象
+     * @param advisedSupport 包含代理配置信息的对象
      */
-    public JdkDynamicAopProxy(AdvisedSupper advisedSupper) {
-        this.advisedSupper = advisedSupper;
+    public JdkDynamicAopProxy(AdvisedSupper advisedSupport) {
+        this.advisedSupport = advisedSupport;
     }
 
     /**
@@ -400,7 +400,7 @@ public class JdkDynamicAopProxy implements AopProxy , InvocationHandler {
      */
     @Override
     public Object getProxy() {
-        return Proxy.newProxyInstance(getClass().getClassLoader(),advisedSupper.getTargetSource().getTargetClass(), this);
+        return Proxy.newProxyInstance(getClass().getClassLoader(),advisedSupport.getTargetSource().getTargetClass(), this);
     }
 
     /**
@@ -417,13 +417,13 @@ public class JdkDynamicAopProxy implements AopProxy , InvocationHandler {
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 
         // 获取到方法匹配器，通过AspectJExpressionPointcut解析传入的切点表达式，调用对应的matches方法判断是否为被代理类
-        if (advisedSupper.getMethodMatcher().matches(method,advisedSupper.getTargetSource().getTarget().getClass())){
+        if (advisedSupport.getMethodMatcher().matches(method,advisedSupport.getTargetSource().getTarget().getClass())){
 
             // 获取到方法拦截器
-            MethodInterceptor methodInterceptor = advisedSupper.getMethodInterceptor();
+            MethodInterceptor methodInterceptor = advisedSupport.getMethodInterceptor();
 
             // 创建ReflectiveMethodInvocation对象，封装了方法调用的相关信息
-            ReflectiveMethodInvocation invocation = new ReflectiveMethodInvocation(method, advisedSupper.getTargetSource().getTarget(), args);
+            ReflectiveMethodInvocation invocation = new ReflectiveMethodInvocation(method, advisedSupport.getTargetSource().getTarget(), args);
 
             // 调用 MethodInterceptor 的 invoke 方法，传入 invocation 作为参数。
             // invoke 方法会执行拦截器逻辑，通常通过 invocation.proceed() 调用目标方法或下一个拦截器。
@@ -432,7 +432,7 @@ public class JdkDynamicAopProxy implements AopProxy , InvocationHandler {
         }
 
         // 如果方法匹配器判断当前调用的方法不满足切点表达式，则直接调用目标方法
-        return method.invoke(advisedSupper.getTargetSource().getTarget(),args);
+        return method.invoke(advisedSupport.getTargetSource().getTarget(),args);
     }
 }
 
@@ -478,16 +478,16 @@ MethodMatcher methodMatcher = pointcut.getMethodMatcher();
 4. 将增强类实例对象，拦截器实例对象以及方法匹配器实例对象注入到AdvisedSupper
 
 ```java
-advisedSupper.setTargetSource(targetSource);  
-advisedSupper.setMethodInterceptor(interceptor);  
-advisedSupper.setMethodMatcher(methodMatcher);  
+advisedSupport.setTargetSource(targetSource);  
+advisedSupport.setMethodInterceptor(interceptor);  
+advisedSupport.setMethodMatcher(methodMatcher);  
 ```
 
 
 5. 创建Jdk代理对象传入AdvisedSupper对象，获取到代理类
 
 ```java
-JdkDynamicAopProxy jdkDynamicAopProxy = new JdkDynamicAopProxy(advisedSupper);  
+JdkDynamicAopProxy jdkDynamicAopProxy = new JdkDynamicAopProxy(advisedSupport);  
 WorldService proxy = (WorldService) jdkDynamicAopProxy.getProxy();  
 ```
 
@@ -505,13 +505,13 @@ proxy.sayHello();
 public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {  
   
     // 获取到方法匹配器，通过AspectJExpressionPointcut解析传入的切点表达式，调用对应的matches方法判断是否为被代理类  
-    if (advisedSupper.getMethodMatcher().matches(method,advisedSupper.getTargetSource().getTarget().getClass())){  
+    if (advisedSupport.getMethodMatcher().matches(method,advisedSupport.getTargetSource().getTarget().getClass())){  
   
         // 获取到方法拦截器  
-        MethodInterceptor methodInterceptor = advisedSupper.getMethodInterceptor();  
+        MethodInterceptor methodInterceptor = advisedSupport.getMethodInterceptor();  
   
         // 创建ReflectiveMethodInvocation对象，封装了方法调用的相关信息  
-        ReflectiveMethodInvocation invocation = new ReflectiveMethodInvocation(method, advisedSupper.getTargetSource().getTarget(), args);  
+        ReflectiveMethodInvocation invocation = new ReflectiveMethodInvocation(method, advisedSupport.getTargetSource().getTarget(), args);  
   
         // 调用 MethodInterceptor 的 invoke 方法，传入 invocation 作为参数。  
         // invoke 方法会执行拦截器逻辑，通常通过 invocation.proceed() 调用目标方法或下一个拦截器。  
@@ -520,7 +520,7 @@ public Object invoke(Object proxy, Method method, Object[] args) throws Throwabl
     }  
   
     // 如果方法匹配器判断当前调用的方法不满足切点表达式，则直接调用目标方法  
-    return method.invoke(advisedSupper.getTargetSource().getTarget(),args);  
+    return method.invoke(advisedSupport.getTargetSource().getTarget(),args);  
 }
 ```
 
@@ -592,20 +592,20 @@ public class DynamicProxyTest {
     @Test  
     public void testDynamicProxy(){  
   
-        AdvisedSupper advisedSupper = new AdvisedSupper();  
+        AdvisedSupper advisedSupport = new AdvisedSupper();  
   
         WorldServiceImpl worldService = new WorldServiceImpl();  
         TargetSource targetSource = new TargetSource(worldService);  
-        advisedSupper.setTargetSource(targetSource);  
+        advisedSupport.setTargetSource(targetSource);  
   
         WorldServiceInterceptor interceptor = new WorldServiceInterceptor();  
-        advisedSupper.setMethodInterceptor(interceptor);  
+        advisedSupport.setMethodInterceptor(interceptor);  
         // "execution(* org.springframework.test.service.WorldService.explode(..))"  
         AspectJExpressionPointcut pointcut = new AspectJExpressionPointcut("execution(* service.org.qlspringframework.beans.WorldService.sayHello(..))");  
         MethodMatcher methodMatcher = pointcut.getMethodMatcher();  
-        advisedSupper.setMethodMatcher(methodMatcher);  
+        advisedSupport.setMethodMatcher(methodMatcher);  
   
-        JdkDynamicAopProxy jdkDynamicAopProxy = new JdkDynamicAopProxy(advisedSupper);  
+        JdkDynamicAopProxy jdkDynamicAopProxy = new JdkDynamicAopProxy(advisedSupport);  
         WorldService proxy = (WorldService) jdkDynamicAopProxy.getProxy();  
         proxy.sayHello();  
   
@@ -625,12 +625,12 @@ Cglib动态代理和Jdk动态代理的实现并无太多的不同，二者之家
 ```java
 public class CglibDynamicAopProxy implements AopProxy {  
   
-    // AdvisedSupper 对象中包含了目标类的信息以及切面的配置  
-    private final AdvisedSupper advisedSupper;  
+    // AdvisedSupport 对象中包含了目标类的信息以及切面的配置  
+    private final AdvisedSupper advisedSupport;  
   
     // 构造方法，初始化 CglibDynamicAopProxy 对象  
-    public CglibDynamicAopProxy(AdvisedSupper advisedSupper) {  
-        this.advisedSupper = advisedSupper;  
+    public CglibDynamicAopProxy(AdvisedSupper advisedSupport) {  
+        this.advisedSupport = advisedSupport;  
     }  
   
     /**  
@@ -644,13 +644,13 @@ public class CglibDynamicAopProxy implements AopProxy {
         Enhancer enhancer = new Enhancer();  
   
         // 设置被代理类的父类（目标对象的真实类）  
-        enhancer.setSuperclass(advisedSupper.getTargetSource().getTarget().getClass());  
+        enhancer.setSuperclass(advisedSupport.getTargetSource().getTarget().getClass());  
   
         // 设置代理对象实现的接口（可选）  
-        enhancer.setInterfaces(advisedSupper.getTargetSource().getTargetInterfaceClass());  
+        enhancer.setInterfaces(advisedSupport.getTargetSource().getTargetInterfaceClass());  
   
         // 设置方法拦截器，用于处理方法调用  
-        enhancer.setCallback(new DynamicAdvisedInterceptor(advisedSupper));  
+        enhancer.setCallback(new DynamicAdvisedInterceptor(advisedSupport));  
   
         // 创建并返回代理对象  
         return enhancer.create();  
@@ -689,10 +689,10 @@ public class CglibDynamicAopProxy implements AopProxy {
   
     // DynamicAdvisedInterceptor 类用于适配 CGLIB 的 MethodInterceptor 接口  
     private static class DynamicAdvisedInterceptor implements MethodInterceptor {  
-        private final AdvisedSupper advisedSupper;  
+        private final AdvisedSupper advisedSupport;  
   
-        private DynamicAdvisedInterceptor(AdvisedSupper advisedSupper) {  
-            this.advisedSupper = advisedSupper;  
+        private DynamicAdvisedInterceptor(AdvisedSupper advisedSupport) {  
+            this.advisedSupport = advisedSupport;  
         }  
   
         /**  
@@ -708,12 +708,12 @@ public class CglibDynamicAopProxy implements AopProxy {
         @Override  
         public Object intercept(Object o, Method method, Object[] objects, MethodProxy methodProxy) throws Throwable {  
             // 创建 CglibMethodInvocation 对象，封装方法调用信息  
-            CglibMethodInvocation methodInvocation = new CglibMethodInvocation(method, advisedSupper.getTargetSource().getTarget(), objects, methodProxy);  
+            CglibMethodInvocation methodInvocation = new CglibMethodInvocation(method, advisedSupport.getTargetSource().getTarget(), objects, methodProxy);  
   
             // 如果切点表达式匹配  
-            if (advisedSupper.getMethodMatcher().matches(method,advisedSupper.getTargetSource().getTarget().getClass())){  
+            if (advisedSupport.getMethodMatcher().matches(method,advisedSupport.getTargetSource().getTarget().getClass())){  
                 // 使用切面的 MethodInterceptor 处理方法调用  
-                return advisedSupper.getMethodInterceptor().invoke(methodInvocation);  
+                return advisedSupport.getMethodInterceptor().invoke(methodInvocation);  
             }  
             // 如果切点表达式不匹配，则直接调用原始方法  
             return method.invoke(o,objects);  

@@ -31,15 +31,15 @@ private boolean proxyTargetClass = false;
 public class ProxyFactory {
 
     // 封装了代理配置（切点、拦截器、目标对象等）
-    private final AdvisedSupper advisedSupper;
+    private final AdvisedSupper advisedSupport;
 
     /**
      * 构造方法
      * 
-     * @param advisedSupper 配置信息容器
+     * @param advisedSupport 配置信息容器
      */
-    public ProxyFactory(AdvisedSupper advisedSupper) {
-        this.advisedSupper = advisedSupper;
+    public ProxyFactory(AdvisedSupper advisedSupport) {
+        this.advisedSupport = advisedSupport;
     }
 
     /**
@@ -59,12 +59,12 @@ public class ProxyFactory {
      * @return AopProxy 实现类
      */
     public AopProxy createAopProxy() {
-        if (advisedSupper.isProxyTargetClass()) {
+        if (advisedSupport.isProxyTargetClass()) {
             // 需要代理类本身，使用 CGLIB
-            return new CglibDynamicAopProxy(advisedSupper);
+            return new CglibDynamicAopProxy(advisedSupport);
         }
         // 默认使用 JDK 动态代理
-        return new JdkDynamicAopProxy(advisedSupper);
+        return new JdkDynamicAopProxy(advisedSupport);
     }
 }
 ```
@@ -87,8 +87,8 @@ public class ProxyFactory {
 ```java
 @Test  
 public void testProxyFactory(){  
-    advisedSupper.setProxyTargetClass(true);  
-    ProxyFactory proxyFactory = new ProxyFactory(advisedSupper);  
+    advisedSupport.setProxyTargetClass(true);  
+    ProxyFactory proxyFactory = new ProxyFactory(advisedSupport);  
     WorldService worldService = (WorldService) proxyFactory.getProxy();  
     worldService.sayHello();  
   
