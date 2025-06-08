@@ -1,4 +1,4 @@
-package org.qlspringframework.test.ioc;
+package org.qlspringframework.test.expanding;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -10,10 +10,10 @@ import org.qlspringframework.test.common.StringToIntegerConverter;
 
 /**
  * @author jixu
- * @title TypeConversionFirstPartTest
+ * @title TypeConversionTest
  * @date 2025/6/3 16:29
  */
-public class TypeConversionFirstPartTest {
+public class TypeConversionTest {
     @Test
     public void testStringToIntegerConverter(){
         StringToIntegerConverter converter = new StringToIntegerConverter();
