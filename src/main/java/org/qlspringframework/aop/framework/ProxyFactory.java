@@ -1,6 +1,6 @@
 package org.qlspringframework.aop.framework;
 
-import org.qlspringframework.aop.AdvisedSupper;
+import org.qlspringframework.aop.AdvisedSupport;
 
 /**
  * 代理工厂类
@@ -15,15 +15,15 @@ import org.qlspringframework.aop.AdvisedSupper;
 public class ProxyFactory {
 
     // 保存代理配置信息的属性
-    private final AdvisedSupper advisedSupper;
+    private final AdvisedSupport advisedSupport;
 
     /**
      * 构造方法，初始化代理工厂
      *
-     * @param advisedSupper 包含代理配置信息的对象
+     * @param advisedSupport 包含代理配置信息的对象
      */
-    public ProxyFactory(AdvisedSupper advisedSupper) {
-        this.advisedSupper = advisedSupper;
+    public ProxyFactory(AdvisedSupport advisedSupport) {
+        this.advisedSupport = advisedSupport;
     }
 
 
@@ -40,12 +40,12 @@ public class ProxyFactory {
      */
     public AopProxy createAopProxy(){
         // 根据配置信息判断是否需要代理目标类本身
-        if (advisedSupper.isProxyTargetClass()){
+        if (advisedSupport.isProxyTargetClass()){
             // 如果需要代理目标类本身，则返回CglibAopProxy代理对象
-            return new CglibDynamicAopProxy(advisedSupper);
+            return new CglibDynamicAopProxy(advisedSupport);
         }
 
         // 如果不需要代理目标类本身，则返回JdkDynamicAopProxy代理对象
-        return new JdkDynamicAopProxy(advisedSupper);
+        return new JdkDynamicAopProxy(advisedSupport);
     }
 }

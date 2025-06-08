@@ -3,7 +3,7 @@ package org.qlspringframework.aop.framework;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
-import org.qlspringframework.aop.AdvisedSupper;
+import org.qlspringframework.aop.AdvisedSupport;
 
 import java.lang.reflect.Method;
 /**
@@ -17,12 +17,12 @@ import java.lang.reflect.Method;
  */
 public class CglibDynamicAopProxy implements AopProxy {
 
-    // AdvisedSupper 对象中包含了目标类的信息以及切面的配置
-    private final AdvisedSupper advisedSupper;
+    // AdvisedSupport 对象中包含了目标类的信息以及切面的配置
+    private final AdvisedSupport advisedSupport;
 
     // 构造方法，初始化 CglibDynamicAopProxy 对象
-    public CglibDynamicAopProxy(AdvisedSupper advisedSupper) {
-        this.advisedSupper = advisedSupper;
+    public CglibDynamicAopProxy(AdvisedSupport advisedSupport) {
+        this.advisedSupport = advisedSupport;
     }
 
     /**
@@ -36,13 +36,13 @@ public class CglibDynamicAopProxy implements AopProxy {
         Enhancer enhancer = new Enhancer();
 
         // 设置被代理类的父类（目标对象的真实类）
-        enhancer.setSuperclass(advisedSupper.getTargetSource().getTarget().getClass());
+        enhancer.setSuperclass(advisedSupport.getTargetSource().getTarget().getClass());
 
         // 设置代理对象实现的接口（可选）
-        enhancer.setInterfaces(advisedSupper.getTargetSource().getTargetInterfaceClass());
+        enhancer.setInterfaces(advisedSupport.getTargetSource().getTargetInterfaceClass());
 
         // 设置方法拦截器，用于处理方法调用
-        enhancer.setCallback(new DynamicAdvisedInterceptor(advisedSupper));
+        enhancer.setCallback(new DynamicAdvisedInterceptor(advisedSupport));
 
         // 创建并返回代理对象
         return enhancer.create();
@@ -81,10 +81,10 @@ public class CglibDynamicAopProxy implements AopProxy {
 
     // DynamicAdvisedInterceptor 类用于适配 CGLIB 的 MethodInterceptor 接口
     private static class DynamicAdvisedInterceptor implements MethodInterceptor {
-        private final AdvisedSupper advisedSupper;
+        private final AdvisedSupport advisedSupport;
 
-        private DynamicAdvisedInterceptor(AdvisedSupper advisedSupper) {
-            this.advisedSupper = advisedSupper;
+        private DynamicAdvisedInterceptor(AdvisedSupport advisedSupport) {
+            this.advisedSupport = advisedSupport;
         }
 
         /**
@@ -99,16 +99,41 @@ public class CglibDynamicAopProxy implements AopProxy {
          */
         @Override
         public Object intercept(Object o, Method method, Object[] objects, MethodProxy methodProxy) throws Throwable {
-            // 创建 CglibMethodInvocation 对象，封装方法调用信息
-            CglibMethodInvocation methodInvocation = new CglibMethodInvocation(method, advisedSupper.getTargetSource().getTarget(), objects, methodProxy);
+            try {
+                String methodName = method.getName();
 
-            // 如果切点表达式匹配
-            if (advisedSupper.getMethodMatcher().matches(method,advisedSupper.getTargetSource().getTarget().getClass())){
-                // 使用切面的 MethodInterceptor 处理方法调用
-                return advisedSupper.getMethodInterceptor().invoke(methodInvocation);
+                // equals/hashCode 直接调用目标对象对应方法
+                if ("equals".equals(methodName) && objects != null && objects.length == 1) {
+                    Object other = objects[0];
+                    if (o == other) {
+                        return true;
+                    }
+                    if (other == null || !o.getClass().isAssignableFrom(other.getClass())) {
+                        return false;
+                    }
+                    Object target = advisedSupport.getTargetSource().getTarget();
+                    return target.equals(other);
+                }
+                if ("hashCode".equals(methodName) && (objects == null || objects.length == 0)) {
+                    Object target = advisedSupport.getTargetSource().getTarget();
+                    return target.hashCode();
+                }
+
+                CglibMethodInvocation methodInvocation = new CglibMethodInvocation(method, advisedSupport.getTargetSource().getTarget(), objects, methodProxy);
+
+                // 规避 equals/hashCode 参与切点匹配
+                if (!("equals".equals(methodName) || "hashCode".equals(methodName)) &&
+                        advisedSupport.getMethodMatcher().matches(method, advisedSupport.getTargetSource().getTarget().getClass())) {
+                    return advisedSupport.getMethodInterceptor().invoke(methodInvocation);
+                }
+
+                // 这里调用目标对象的方法，避免递归调用代理自身方法
+                return method.invoke(advisedSupport.getTargetSource().getTarget(), objects);
+            } catch (Throwable t) {
+                System.err.println("CglibDynamicAopProxy intercept exception: " + t);
+                t.printStackTrace();
+                throw t;
             }
-            // 如果切点表达式不匹配，则直接调用原始方法
-            return method.invoke(o,objects);
         }
     }
 }
