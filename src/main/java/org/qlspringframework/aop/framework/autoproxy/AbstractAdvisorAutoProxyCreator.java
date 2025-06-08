@@ -2,18 +2,16 @@ package org.qlspringframework.aop.framework.autoproxy;
 
 import org.aopalliance.aop.Advice;
 import org.aopalliance.intercept.MethodInterceptor;
-import org.qlspringframework.aop.AdvisedSupper;
-import org.qlspringframework.aop.Advisor;
-import org.qlspringframework.aop.PointCut;
-import org.qlspringframework.aop.TargetSource;
+import org.qlspringframework.aop.*;
 import org.qlspringframework.aop.aspectj.AspectJExpressionPointcutAdvisor;
 import org.qlspringframework.aop.framework.ProxyFactory;
 import org.qlspringframework.beans.BeansException;
 import org.qlspringframework.beans.factory.BeanFactory;
-import org.qlspringframework.beans.factory.config.BeanDefinition;
 import org.qlspringframework.beans.factory.supper.DefaultListableBeanFactory;
 
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * 抽象的顾问自动代理创建者类
@@ -28,6 +26,8 @@ public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyC
 
     // 定义一个 BeanFactory 属性，用于管理 Bean 的创建和生命周期。
     private DefaultListableBeanFactory beanFactory;
+
+    private Set<Object> earlyProxyReferences = new HashSet<>();
 
     /**
      * 设置 BeanFactory。
@@ -92,8 +92,11 @@ public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyC
      */
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) {
+        if (!earlyProxyReferences.contains(beanName)) {
+            return wrapIfNecessary(bean, beanName);
+        }
 
-        return wrapIfNecessary(bean, beanName);
+        return bean;
 
     }
 
@@ -110,20 +113,15 @@ public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyC
         Class<?> beanClass = bean.getClass();
         // 避免代理AOP相关配置类
         if (isInfrastructureClass(beanClass)) {
-            return null;
+            return bean;
         }
 
         // 获取到所有的Advisor
         Collection<AspectJExpressionPointcutAdvisor> advisors = beanFactory.getBeanOfType(AspectJExpressionPointcutAdvisor.class).values();
         try {
-            for (AspectJExpressionPointcutAdvisor advisor : advisors) {
-                // 如果要代理的是当前类
-                if (advisor.getPointcut().getClassFilter().matches(beanClass)) {
-                    AdvisedSupper advisedSupper = new AdvisedSupper();
 
-                    BeanDefinition beanDefinition = beanFactory.getBeanDefinition(beanName);
-                    Object beanInstantiate = beanFactory.getInstantiationStrategy().instantiate(beanDefinition);
-                    TargetSource targetSource = new TargetSource(beanInstantiate);
+
+            for (AspectJExpressionPointcutAdvisor advisor : advisors) {
 
                 ClassFilter classFilter = advisor.getPointcut().getClassFilter();
                 if (classFilter.matches(bean.getClass())) {
@@ -141,6 +139,20 @@ public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyC
         }
 
         return bean;
+    }
+
+    /**
+     * 用于处理循环依赖问题，获取早期的代理Bean引用对象
+     *
+     * 对于代理Bean的创建时机，并非是单一的populateBean之后，如果产生了循环依赖则会提前创建代理对象
+     * @param bean
+     * @param beanName
+     * @return
+     */
+    @Override
+    public Object getEarlyBeanReference(Object bean, String beanName) {
+        earlyProxyReferences.add(beanName);
+        return wrapIfNecessary(bean,beanName);
     }
 }
 

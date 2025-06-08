@@ -9,6 +9,7 @@ import org.qlspringframework.beans.PropertyValues;
 import org.qlspringframework.beans.factory.BeanFactoryAware;
 import org.qlspringframework.beans.factory.DisposableBean;
 import org.qlspringframework.beans.factory.InitializingBean;
+import org.qlspringframework.beans.factory.ObjectFactory;
 import org.qlspringframework.beans.factory.config.*;
 import org.qlspringframework.core.convert.ConversionService;
 
@@ -83,7 +84,10 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
             bean = createBeanInstance(beanDefinition);
 
             // 提前暴露Bean
-            super.earlySingletonObjects.put(beanName,bean);
+            if (beanDefinition.isSingleton()){
+                Object finalBean = bean;
+                addSingletonFactory(beanName, () -> getEarlyBeanReference(beanName, finalBean));
+            }
 
             // 在赋值之前执行占位符替换逻辑
             applyBeanPostprocessorsBeforeApplyingPropertyValues(beanName, bean, beanDefinition);
@@ -101,10 +105,38 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
         // 创建完毕后加入缓存
         if (beanDefinition.isSingleton()){
-            super.addSingletonBean(beanName, bean);
+            // 如果循环依赖创建了代理对象，在这里不会去重复创建需要从缓存当中取出来
+            Object exposedObject = getSingletonBean(beanName);
+            super.addSingletonBean(beanName, exposedObject);
         }
         return bean;
     }
+
+/**
+ * 获取早期代理对象的Bean引用
+ * 该方法用于获取一个Bean的早期引用，以便在所有BeanPostProcessor都处理完毕之前使用
+ * 这在某些情况下对于循环依赖的处理特别有用
+ *
+ * @param beanName Bean的名称，用于标识Bean
+ * @param bean     尚未完全初始化的Bean实例
+ * @return 返回早期的Bean引用，可能是经过某些处理（比如代理）的对象
+ */
+private Object getEarlyBeanReference(String beanName, Object bean) {
+    Object exposedObject = bean;
+    // 遍历所有BeanPostProcessor
+    for (BeanPostProcessor beanPostProcessor : getBeanPostProcessors()) {
+        // 检查BeanPostProcessor是否实现了SmartInstantiationAwareBeanPostProcessor接口
+        if (beanPostProcessor instanceof SmartInstantiationAwareBeanPostProcessor) {
+            // 调用getEarlyBeanReference方法获取早期Bean引用
+            exposedObject = ((SmartInstantiationAwareBeanPostProcessor) beanPostProcessor).getEarlyBeanReference(exposedObject, beanName);
+            if (exposedObject == null) {
+                return exposedObject;
+            }
+        }
+    }
+    // 如果没有获取到早期Bean引用，则返回原始Bean实例
+    return exposedObject;
+}
 
 
 

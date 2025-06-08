@@ -1,6 +1,7 @@
 package org.qlspringframework.beans.factory.supper;
 
 import org.qlspringframework.beans.factory.DisposableBean;
+import org.qlspringframework.beans.factory.ObjectFactory;
 import org.qlspringframework.beans.factory.config.SingletonBeanRegistry;
 
 import java.util.Map;
@@ -15,11 +16,15 @@ import java.util.concurrent.ConcurrentHashMap;
  **/
 public class DefaultSingletonBeanRegistry implements SingletonBeanRegistry {
 
-    // 保存单列Bean的地方
-    private Map<String , Object> singletonObjects = new ConcurrentHashMap<>();
+    // 一级缓存，保存单列Bean的地方
+    private Map<String , Object> singletonObjects = new ConcurrentHashMap<>(255);
 
     // 二级缓存，保存实例化后的Bean
-    protected Map<String , Object> earlySingletonObjects = new ConcurrentHashMap<>();
+    protected Map<String , Object> earlySingletonObjects = new ConcurrentHashMap<>(255);
+
+    // 三级缓存
+    protected Map<String , ObjectFactory<?>> singletonFactories = new ConcurrentHashMap<>(16);
+
 
     // 保存含有销毁方法的Bean的地方
     private Map<String , DisposableBean> disposableBeans = new ConcurrentHashMap<>();
@@ -30,7 +35,9 @@ public class DefaultSingletonBeanRegistry implements SingletonBeanRegistry {
         this.disposableBeans.put(beanName,disposableBean);
     }
 
-
+    public void addSingletonFactory(String beanName , ObjectFactory<?> objectFactory){
+        singletonFactories.put(beanName,objectFactory);
+    }
 
     public void destroySingletons(){
         Set<String> beanNames = disposableBeans.keySet();
@@ -53,11 +60,25 @@ public class DefaultSingletonBeanRegistry implements SingletonBeanRegistry {
      */
     @Override
     public Object getSingletonBean(String beanName) {
-        Object singletonObejct = singletonObjects.get(beanName);
-        if (singletonObejct == null){
-            singletonObejct = earlySingletonObjects.get(beanName);
+        Object singletonObject = singletonObjects.get(beanName);
+        if (singletonObject == null){
+            singletonObject = earlySingletonObjects.get(beanName);
+            if (singletonObject == null){
+                ObjectFactory<?> objectFactory = singletonFactories.get(beanName);
+                if (objectFactory != null){
+                    // 获取到真实的对象引用
+                    singletonObject = objectFactory.getObject();
+
+                    // 添加到二级缓存当中
+                    earlySingletonObjects.put(beanName,singletonObject);
+
+                    // 三级缓存移除当前Bean
+                    singletonFactories.remove(beanName);
+                }
+
+            }
         }
-        return singletonObejct;
+        return singletonObject;
     }
 
     /**

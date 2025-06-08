@@ -14,6 +14,8 @@ public class A {
     @Autowired
     private B b;
 
+    public void func(){}
+
 
     public B getB() {
         return b;

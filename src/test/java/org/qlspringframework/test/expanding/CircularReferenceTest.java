@@ -1,5 +1,6 @@
 package org.qlspringframework.test.expanding;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.qlspringframework.context.support.ClassPathXmlApplicationContext;
 import org.qlspringframework.test.bean.A;
@@ -19,5 +20,13 @@ public class CircularReferenceTest {
         A a = applicationContext.getBean("a", A.class);
         B b = applicationContext.getBean("b", B.class);
 
+        System.out.println(a);
+        System.out.println(b.getA());
+        Assert.assertEquals(b.getA(),a);
+
+
     }
+
+
+
 }

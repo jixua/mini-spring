@@ -17,7 +17,7 @@ import org.qlspringframework.test.service.HelloService;
  * @title People
  * @date 2025/4/7 09:54
  */
-// @Component
+@Component
 public class People implements DisposableBean, InitializingBean, BeanFactoryAware , ApplicationContextAware {
 
 
@@ -34,7 +34,7 @@ public class People implements DisposableBean, InitializingBean, BeanFactoryAwar
         return helloService;
     }
 
-    // @Value("10")
+    @Value("10")
     private Integer age;
 
     private Car car;

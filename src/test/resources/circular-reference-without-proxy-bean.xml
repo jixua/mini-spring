@@ -7,6 +7,27 @@
 		 http://www.springframework.org/schema/context
 		 http://www.springframework.org/schema/context/spring-context-4.0.xsd">
 
-    <context:component-scan base-package="org.qlspringframework.beans.factory.annotation,org.qlspringframework.test.bean"/>
+    <bean id="b" class="org.qlspringframework.test.bean.B">
+        <property name="a" ref="a"/>
+    </bean>
+
+    <!-- a被代理 -->
+    <bean id="a" class="org.qlspringframework.test.bean.A">
+        <property name="b" ref="b"/>
+    </bean>
+
+    <bean class="org.qlspringframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator"/>
+
+    <bean id="pointcutAdvisor" class="org.qlspringframework.aop.aspectj.AspectJExpressionPointcutAdvisor">
+        <property name="expression" value="execution(* org.qlspringframework.test.bean.A.func(..))"/>
+        <property name="advice" ref="methodInterceptor"/>
+    </bean>
+
+
+    <bean id="methodInterceptor" class="org.qlspringframework.aop.framework.adapter.MethodBeforeAdviceInterceptor">
+        <property name="advice" ref="beforeAdvice"/>
+    </bean>
+
+    <bean id="beforeAdvice" class="org.qlspringframework.test.common.ABefpreAdvice"/>
 
 </beans>
